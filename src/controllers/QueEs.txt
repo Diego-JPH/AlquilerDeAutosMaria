@@ -1,0 +1,1 @@
+Contiene la lógica que se ejecuta cuando se llama a una ruta (por ejemplo, crear una reserva, listar autos).

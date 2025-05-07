@@ -1,0 +1,32 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Entorno
+.env
+.env.*  # por si usás .env.development, .env.production, etc.
+
+# Logs
+logs/
+*.log
+*.out
+*.err
+
+# Sistema operativo
+.DS_Store  # macOS
+Thumbs.db  # Windows
+
+# Editor de texto
+.vscode/
+.idea/
+*.swp
+
+# Coverage de tests
+coverage/
+
+# Archivos generados por Postman
+*.postman_collection.json
+*.postman_environment.json

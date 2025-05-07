@@ -1,0 +1,1 @@
+Funciones que se ejecutan antes o después de un request (autenticación, validación, logs).

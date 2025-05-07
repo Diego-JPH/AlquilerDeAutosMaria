@@ -1,0 +1,1 @@
+Funciones reutilizables que no dependen del negocio (por ejemplo, formatear fechas).

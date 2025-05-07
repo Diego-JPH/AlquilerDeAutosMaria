@@ -1,0 +1,1 @@
+Contiene lógica de negocio (cálculo de precios, validaciones, disponibilidad).

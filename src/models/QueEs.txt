@@ -1,0 +1,1 @@
+Define la estructura de tus datos. Como MongoDB o MySQL.
