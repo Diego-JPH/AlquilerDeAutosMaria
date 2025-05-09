@@ -1,3 +1,11 @@
-const users = [];
+const pool = require('../config/db');
 
-module.exports = users;
+async function createUser(nombre, email) {
+  const [result] = await pool.query(
+    'INSERT INTO usuarios (nombre, email) VALUES (?, ?)',
+    [nombre, email]
+  );
+  return result.insertId;
+}
+
+module.exports = { createUser };

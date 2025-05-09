@@ -6,3 +6,15 @@ exports.listUsers = (req, res) => { //crea y exporta una arrow function para usa
     }
     return res.status(200).json(users); //devuelve la lista de usuarios
 }
+
+const User = require('../models/User');
+
+exports.createUser = async (req, res) => {
+  const { nombre, email } = req.body;
+  try {
+    const userId = await User.createUser(nombre, email);
+    res.status(201).json({ id: userId, nombre, email });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al crear usuario' });
+  }
+};
