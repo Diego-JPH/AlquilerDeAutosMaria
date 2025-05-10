@@ -4,11 +4,10 @@ import React from 'react'
 function App() {
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>Alquileres de autos Maria</h1>
-       {/* <UserList /> */}
+      <h1>Alquileres de autos Maria #TETAS</h1>
+      {/* <UserList /> */}
     </div>
   )
 }
 
 export default App
-
