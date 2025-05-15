@@ -30,8 +30,7 @@ services:
       - "3000:3000"
     depends_on:
       - db
-    environment:
-      DB_HOST: db
-      DB_USER: maria
-      DB_PASSWORD: maria123
-      DB_NAME: alquileres
+    volumes:
+      - ./Backend:/app
+    env_file:
+      - ./Backend/.env # Docker automáticamente carga las variables del archivo .env
