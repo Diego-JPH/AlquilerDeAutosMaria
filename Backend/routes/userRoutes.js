@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const userController = require('../controllers/userController');
 
-//router.post('/register', registerController.registerUser); //ruta para registrar un usuario
-//router.get('/list', userController.listUsers); //ruta para listar los usuarios
+router.post('/registrar-cliente', userController.registrarCliente);
 
-module.exports = router; //exporta el router para usarlo en otros archivos (app.js)
+module.exports = router;
