@@ -5,23 +5,31 @@ const findUserByEmail = async (email) => {
   return rows[0];
 };
 
-const insertUser = async (email, nombre, apellido) => {
+// Ahora incluye contraseña y rol
+const insertUser = async (email, nombre, apellido, contraseña, rol) => {
   const [result] = await db.query(
-    'INSERT INTO Usuario (email, nombre, apellido) VALUES (?, ?, ?)',
-    [email, nombre, apellido]
+    'INSERT INTO Usuario (email, nombre, apellido, contraseña, rol) VALUES (?, ?, ?, ?, ?)',
+    [email, nombre, apellido, contraseña, rol]
   );
   return result.insertId;
 };
 
-const insertCliente = async (id_usuario, contraseña, fechaN) => {
+// Ya no se guarda la contraseña en Cliente
+const insertCliente = async (id_usuario, fechaN) => {
   await db.query(
-    'INSERT INTO Cliente (id_usuario, contraseña, fechaN) VALUES (?, ?, ?)',
-    [id_usuario, contraseña, fechaN]
+    'INSERT INTO Cliente (id_usuario, fechaN) VALUES (?, ?)',
+    [id_usuario, fechaN]
   );
+};
+
+const findClienteById = async (id_usuario) => {
+  const [rows] = await db.query('SELECT * FROM Cliente WHERE id_usuario = ?', [id_usuario]);
+  return rows[0];
 };
 
 module.exports = {
   findUserByEmail,
   insertUser,
-  insertCliente
+  insertCliente,
+  findClienteById
 };

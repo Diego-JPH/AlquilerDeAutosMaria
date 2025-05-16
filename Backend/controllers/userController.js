@@ -2,7 +2,7 @@ const userModel = require('../models/userModels');
 const dayjs = require('dayjs');
 
 const registrarCliente = async (req, res) => {
-  const { nombre, apellido, fechaN, email, contraseña } = req.body;
+  const { email, nombre, apellido, contraseña, fechaN } = req.body;
 
   // Verificar si el email ya está registrado
   const existente = await userModel.findUserByEmail(email);
@@ -17,12 +17,37 @@ const registrarCliente = async (req, res) => {
   }
 
   // Insertar usuario y cliente
-  const id_usuario = await userModel.insertUser(email, nombre, apellido);
-  await userModel.insertCliente(id_usuario, contraseña, fechaN);
+  const id_usuario = await userModel.insertUser(email, nombre, apellido, contraseña, 'cliente');
+  await userModel.insertCliente(id_usuario, fechaN);
 
   return res.status(201).json({ mensaje: 'El usuario fue registrado.' });
 };
 
+const iniciarSesion = async (req, res) => {
+  const { email, contraseña } = req.body;
+
+  const usuario = await userModel.findUserByEmail(email);
+  if (!usuario) {
+    return res.status(404).json({ mensaje: "Usuario no registrado en el sistema" });
+  }
+
+  if (usuario.contraseña !== contraseña) {
+    return res.status(401).json({ mensaje: "El email o la contraseña son incorrectos" });
+  }
+
+  // Autenticación exitosa
+  res.status(200).json({
+    mensaje: "Inicio de sesión exitoso",
+    usuario: {
+      id: usuario.id_usuario,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      rol: usuario.rol
+    }
+  });
+};
+
 module.exports = {
-  registrarCliente
+  registrarCliente,
+  iniciarSesion
 };
