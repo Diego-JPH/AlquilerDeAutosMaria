@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const userRoutes = require('./routes/userRoutes');
 const reserveRoutes = require('./routes/reserveRoutes'); //importa las rutas de reservas
-
 // Middleware to parse JSON
 app.use(express.json());
 

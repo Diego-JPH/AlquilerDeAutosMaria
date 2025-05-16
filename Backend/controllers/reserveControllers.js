@@ -1,6 +1,7 @@
 const dayjs = require('dayjs');
 const driverModel = require('../models/driver');
 const reserveModel = require('../models/reserve');
+const creditCardModel = require('../models/creditCardModels');
 
 const changeDriver = async (req, res) => {
     const { nombre, apellido, fechaNacimiento, licencia, idReserva } = req.body;
@@ -47,6 +48,37 @@ const changeDriver = async (req, res) => {
     }
 };
 
+const cancelReserve = async (req, res) => {
+    const { idReserva, motivo, tipoCancelacion, numero_tarjeta, monto } = req.body;
+
+    try {
+        const reserva = await reserveModel.obtenerReservaPorId(idReserva);
+        if (!reserva) return res.status(404).json({ error: 'Reserva no encontrada.' });
+
+        const hoy = dayjs();
+        const fechaDesde = dayjs(reserva.fechaDesde);
+
+        if (tipoCancelacion === 'cliente' && fechaDesde.diff(hoy, 'day') < 1) {
+            return res.status(400).json({ error: 'La cancelación debe hacerse con un día de anticipación.' });
+        }
+
+        await reserveModel.registrarCancelacion(idReserva, motivo, tipoCancelacion);
+
+        await reserveModel.marcarReservaComoCancelada(idReserva);
+
+        if (numero_tarjeta && monto) {
+            await creditCardModel.reembolsarATarjeta(numero_tarjeta, monto);
+        }
+
+        return res.status(200).json({ mensaje: 'Reserva cancelada correctamente.' });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error al cancelar reserva.' });
+    }
+}
+
 module.exports = {
-    changeDriver
+    changeDriver,
+    cancelReserve
 };

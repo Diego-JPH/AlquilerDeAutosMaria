@@ -1,4 +1,5 @@
-// Verifica si ya hay una reserva activa con esa licencia
+const db = require('../config/db');
+
 async function licenciaConReservaActiva(licencia) {
     const [rows] = await db.query(
         `SELECT r.*
@@ -50,11 +51,72 @@ async function actualizarConductor(idReserva, idConductor) {
     );
 }
 
+// funciones para cancelar reservas
+async function obtenerReservaPorId(idReserva) {
+    const [rows] = await db.query('SELECT * FROM Reserva WHERE id_reserva = ?', [idReserva]);
+    return rows[0] || null;
+}
+
+async function cancelarReserva(idReserva) {
+    await db.query('DELETE FROM Reserva WHERE id_reserva = ?', [idReserva]);
+}
+
+async function registrarReembolso(idReserva, idTarjeta, monto, motivo) {
+    await db.query(
+        'INSERT INTO Reembolso (id_reserva, id_tarjeta, monto, motivo, fecha) VALUES (?, ?, ?, ?, NOW())',
+        [idReserva, idTarjeta, monto, motivo]
+    );
+}
+
+async function obtenerFechaDesdePorId(idReserva) {
+    const [rows] = await db.query('SELECT fechaDesde FROM Reserva WHERE id_reserva = ?', [idReserva]);
+    return rows[0]?.fechaDesde || null;
+}
+
+async function eliminarConductorSiNoTieneReservas(idConductor) {
+    const [rows] = await db.query('SELECT COUNT(*) AS total FROM Reserva WHERE id_conductor = ?', [idConductor]);
+    if (rows[0].total === 0) {
+        await db.query('DELETE FROM Conductor WHERE id_conductor = ?', [idConductor]);
+    }
+}
+
+async function marcarReservaComoCancelada(idReserva) {
+    const sql = `UPDATE Reserva SET estado = 'cancelada' WHERE id_reserva = ?`;
+    try {
+        const [result] = await db.execute(sql, [idReserva]);
+        return result.affectedRows > 0;
+    } catch (error) {
+        console.error('Error al marcar reserva como cancelada:', error);
+        throw error;
+    }
+}
+
+async function registrarCancelacion(idReserva, motivo, tipo_cancelacion) {
+    const sql = `
+        INSERT INTO Cancelacion (id_reserva, motivo, fecha_cancelacion, tipo_cancelacion)
+        VALUES (?, ?, NOW(), ?)
+    `;
+    try {
+        const [result] = await db.execute(sql, [idReserva, motivo, tipo_cancelacion]);
+        return result.insertId;
+    } catch (error) {
+        console.error('Error al registrar cancelación:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     eliminarConductor,
     crearConductor,
     obtenerIdConductorPorReserva,
     actualizarConductor,
     conductorTieneReservaActiva,
-    licenciaConReservaActiva
+    licenciaConReservaActiva,
+    obtenerReservaPorId,
+    cancelarReserva,
+    registrarReembolso,
+    obtenerFechaDesdePorId,
+    eliminarConductorSiNoTieneReservas,
+    marcarReservaComoCancelada,
+    registrarCancelacion
 };
