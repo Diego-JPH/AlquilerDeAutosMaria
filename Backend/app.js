@@ -1,13 +1,22 @@
-const express = require('express')
-const app = express()
-const userRoutes = require('./routes/userRoutes');
+const express = require('express');
+const app = express();
 
-// Middleware to parse JSON
+// Rutas
+const userRoutes = require('./routes/userRoutes');
+const vehicleRoutes = require('./routes/vehicleRoutes');
+
+// Middlewares
 app.use(express.json());
-app.use(userRoutes); //ruta para el registro de usuarios
-app.get('/', (req, res) => { //ruta base para comprobar que el servidor esta corriendo
-    res.send('Servidor corriendo'); //devuelve un mensaje de exito
+
+// Uso de rutas
+app.use(userRoutes);
+app.use('/api', vehicleRoutes);
+
+// Ruta base
+app.get('/', (req, res) => {
+    res.send('Servidor corriendo');
 });
+
 app.listen(3000, () => {
     console.log('Servidor corriendo en puerto 3000');
 });
