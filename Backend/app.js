@@ -9,7 +9,8 @@ app.use(express.json());
 
 app.use('/api/reserve', reserveRoutes); //ruta para las reservas
 app.use('/api/user', userRoutes); //ruta para los usuarios
-app.use('/api', vehicleRoutes); // ruta para vehiculos (modificar vehiculo)
+app.use('/api/vehicle', vehicleRoutes);
+
 app.get('/', (req, res) => { //ruta base para comprobar que el servidor esta corriendo
     res.send('Servidor corriendo'); //devuelve un mensaje de exito
 });
