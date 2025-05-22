@@ -2,11 +2,8 @@ const express = require('express');
 const app = express();
 const userRoutes = require('./routes/userRoutes');
 const reserveRoutes = require('./routes/reserveRoutes'); //importa las rutas de reservas
-<<<<<<< HEAD
 require('dotenv').config();
-=======
 const vehicleRoutes = require('./routes/vehicleRoutes');
->>>>>>> 9775cd9f3e90f4afd96bea13af5a4d80fe6d8058
 
 // Middleware to parse JSON
 app.use(express.json());
