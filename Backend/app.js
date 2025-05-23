@@ -1,18 +1,19 @@
 const express = require('express');
 const app = express();
+
 const userRoutes = require('./routes/userRoutes');
 const reserveRoutes = require('./routes/reserveRoutes'); //importa las rutas de reservas
 require('dotenv').config();
 const vehicleRoutes = require('./routes/vehicleRoutes');
 
-// Middleware to parse JSON
 app.use(express.json());
-app.use('/api/reserve', reserveRoutes); //ruta para las reservas
-app.use('/api/user', userRoutes); //ruta para los usuarios
-app.use('/api/vehicle', vehicleRoutes);
 
-app.get('/', (req, res) => { //ruta base para comprobar que el servidor esta corriendo
-    res.send('Servidor corriendo'); //devuelve un mensaje de exito
+app.use('/api/reserve', reserveRoutes);
+app.use('/api/user', userRoutes); 
+app.use('/api/vehicles', vehicleRoutes);
+
+app.get('/', (req, res) => {
+    res.send('Servidor corriendo');
 });
 
 app.listen(3000, () => {
