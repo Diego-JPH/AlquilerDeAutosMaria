@@ -13,6 +13,15 @@ async function licenciaConReservaActiva(licencia) {
     return rows.length > 0;
 }
 
+const obtenerEstadoReserva = async (idReserva) => {
+    const [result] = await db.execute(
+        'SELECT estado FROM Reserva WHERE id_reserva = ?',
+        [idReserva]
+    );
+    if (result.length === 0) return null;
+    return result[0].estado;
+};
+
 async function eliminarConductor(idConductor) {
     await db.query('DELETE FROM Conductor WHERE id_conductor = ?', [idConductor]);
 }
@@ -81,16 +90,12 @@ async function eliminarConductorSiNoTieneReservas(idConductor) {
     }
 }
 
-async function marcarReservaComoCancelada(idReserva) {
-    const sql = `UPDATE Reserva SET estado = 'cancelada' WHERE id_reserva = ?`;
-    try {
-        const [result] = await db.execute(sql, [idReserva]);
-        return result.affectedRows > 0;
-    } catch (error) {
-        console.error('Error al marcar reserva como cancelada:', error);
-        throw error;
-    }
-}
+const marcarReservaComoCancelada = async (idReserva) => {
+    await db.execute(
+        'UPDATE Reserva SET estado = ? WHERE id_reserva = ?',
+        ['cancelada', idReserva]
+    );
+};
 
 async function registrarCancelacion(idReserva, motivo, tipo_cancelacion) {
     const sql = `
@@ -101,7 +106,7 @@ async function registrarCancelacion(idReserva, motivo, tipo_cancelacion) {
         const [result] = await db.execute(sql, [idReserva, motivo, tipo_cancelacion]);
         return result.insertId;
     } catch (error) {
-        console.error('Error al registrar cancelaciÃ³n:', error);
+        console.error('Error al registrar cancelacion:', error);
         throw error;
     }
 }
@@ -179,5 +184,6 @@ module.exports = {
     obtenerVehiculoEnSucursal,
     buscarConductorPorLicencia,
     obtenerReservasActivasConductor,
-    crearReserva
+    crearReserva,
+    obtenerEstadoReserva
 };

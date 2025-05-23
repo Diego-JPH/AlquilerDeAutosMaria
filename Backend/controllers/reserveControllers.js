@@ -6,39 +6,32 @@ const creditCardModel = require('../models/creditCardModels');
 const changeDriver = async (req, res) => {
     const { nombre, apellido, fechaNacimiento, licencia, idReserva } = req.body;
 
-    // Validar mayoría de edad
     const edad = dayjs().diff(dayjs(fechaNacimiento), 'year');
     if (edad < 18) {
         return res.status(400).json({ error: 'El conductor debe ser mayor de edad.' });
     }
 
     try {
-        // Verificar si la licencia ya está registrada (no se permite repetir)
         const licenciaExistente = await driverModel.buscarPorLicencia(licencia);
         if (licenciaExistente) {
             return res.status(400).json({ error: 'La licencia ya está asociada a otro conductor.' });
         }
 
-        // Verificar si hay una reserva activa con esa licencia
         const tieneReserva = await reserveModel.licenciaConReservaActiva(licencia);
         if (tieneReserva) {
             return res.status(400).json({ error: 'La licencia ya está asociada a una reserva activa.' });
         }
 
-        // Obtener ID del conductor anterior
         const viejoId = await reserveModel.obtenerIdConductorPorReserva(idReserva);
         if (!viejoId) {
             return res.status(404).json({ error: 'Reserva no encontrada.' });
-        } //si esto sucede es porque la reserva nunca existio
+        }
 
-        // Crear nuevo conductor
-        const nuevoId = await reserveModel.crearConductor(nombre, apellido, fechaNacimiento, licencia);
+        const nuevoId = await reserveModel.crearConductor(licencia, nombre, apellido, fechaNacimiento);
 
-        // Actualizar reserva con el nuevo conductor
         await reserveModel.actualizarConductor(idReserva, nuevoId);
 
-        // Eliminar al conductor anterior
-        await reserveModel.eliminarConductor(viejoId);
+        await reserveModel.eliminarConductorSiNoTieneReservas(viejoId);
 
         return res.status(200).json({ mensaje: 'Conductor actualizado correctamente.' });
 
@@ -55,6 +48,10 @@ const cancelReserve = async (req, res) => {
         const reserva = await reserveModel.obtenerReservaPorId(idReserva);
         if (!reserva) return res.status(404).json({ error: 'Reserva no encontrada.' });
 
+        if (reserva.estado === 'cancelada') {
+            return res.status(400).json({ error: 'La reserva ya está cancelada.' });
+        }
+
         const hoy = dayjs();
         const fechaDesde = dayjs(reserva.fechaDesde);
 
@@ -63,7 +60,6 @@ const cancelReserve = async (req, res) => {
         }
 
         await reserveModel.registrarCancelacion(idReserva, motivo, tipoCancelacion);
-
         await reserveModel.marcarReservaComoCancelada(idReserva);
 
         if (numero_tarjeta && monto) {
@@ -76,10 +72,9 @@ const cancelReserve = async (req, res) => {
         console.error(error);
         return res.status(500).json({ error: 'Error al cancelar reserva.' });
     }
-}
+};
 
 const reserveVehicle = async (req, res) => {
-
     const {
         id_vehiculo,
         fechaDesde,
@@ -92,12 +87,13 @@ const reserveVehicle = async (req, res) => {
         licencia,
         id_usuario,
     } = req.body;
+
     try {
         const fechaRetiro = new Date(fechaDesde);
         const fechaEntrega = new Date(fechaHasta);
 
         if (fechaRetiro >= fechaEntrega) {
-            return res.status(400).json({ error: 'Las fechas ingresadas son inválidas. Por favor revise los datos.' });
+            return res.status(400).json({ error: 'Las fechas ingresadas son inválidas.' });
         }
 
         const reservasExistentes = await reserveModel.verificarDisponibilidadVehiculo(id_vehiculo, fechaDesde, fechaHasta);
@@ -120,24 +116,17 @@ const reserveVehicle = async (req, res) => {
                 return res.status(400).json({ error: 'La fecha de nacimiento es inválida.' });
             }
 
-            const fechaNacimiento = dayjs(fechaN);
-            const hoy = dayjs();
-            const edad = hoy.diff(fechaNacimiento, 'year');
-
+            const edad = dayjs().diff(dayjs(fechaN), 'year');
             if (edad < 18) {
-                return res.status(400).json({ error: 'El conductor debe ser mayor de edad. Por favor revise los datos.' });
+                return res.status(400).json({ error: 'El conductor debe ser mayor de edad.' });
             }
 
             conductorId = await reserveModel.crearConductor(licencia, nombre, apellido, fechaN);
         }
 
-        if (!licencia) {
-            return res.status(400).json({ error: 'La licencia de conducir es inválida. Revise los datos.' });
-        }
-
         const reservasActivas = await reserveModel.obtenerReservasActivasConductor(licencia, fechaDesde, fechaHasta);
         if (reservasActivas.length > 0) {
-            return res.status(409).json({ error: 'El conductor ya está asignado a otra reserva activa. Revise las fechas.' });
+            return res.status(409).json({ error: 'El conductor ya tiene otra reserva activa en ese período.' });
         }
 
         const reservaId = await reserveModel.crearReserva({
@@ -154,9 +143,8 @@ const reserveVehicle = async (req, res) => {
         return res.status(201).json({ message: 'Reserva realizada con éxito.', reservaId });
 
     } catch (error) {
-        console.error('Error al crear la reserva:', error.message);
-        console.error(error.stack); // esto muestra la traza
-        return res.status(500).json({ error: 'Ocurrió un error al procesar la reserva.', error });
+        console.error('Error al crear la reserva:', error);
+        return res.status(500).json({ error: 'Ocurrió un error al procesar la reserva.' });
     }
 };
 
