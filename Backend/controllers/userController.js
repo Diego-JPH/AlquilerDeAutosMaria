@@ -1,5 +1,8 @@
 const userModel = require('../models/userModels');
 const dayjs = require('dayjs');
+const jwt = require('jsonwebtoken');
+
+const SECRET_KEY = process.env.JWT_SECRET;
 
 const registrarCliente = async (req, res) => {
   const { email, nombre, apellido, contraseña, fechaN } = req.body;
@@ -35,15 +38,16 @@ const iniciarSesion = async (req, res) => {
     return res.status(401).json({ mensaje: "El email o la contraseña son incorrectos" });
   }
 
-  // Autenticación exitosa
+  // Generar token
+  const token = jwt.sign(
+    { id: usuario.id_usuario, rol: usuario.rol, nombre: usuario.nombre },
+    SECRET_KEY,
+    { expiresIn: '1h' }
+  );
+
   res.status(200).json({
     mensaje: "Inicio de sesión exitoso",
-    usuario: {
-      id: usuario.id_usuario,
-      nombre: usuario.nombre,
-      apellido: usuario.apellido,
-      rol: usuario.rol
-    }
+    token
   });
 };
 
