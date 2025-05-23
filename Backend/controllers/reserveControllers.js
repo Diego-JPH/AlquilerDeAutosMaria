@@ -79,7 +79,7 @@ const cancelReserve = async (req, res) => {
 }
 
 const reserveVehicle = async (req, res) => {
-    console.log('INICIO');
+
     const {
         id_vehiculo,
         fechaDesde,
@@ -99,26 +99,28 @@ const reserveVehicle = async (req, res) => {
         if (fechaRetiro >= fechaEntrega) {
             return res.status(400).json({ error: 'Las fechas ingresadas son inválidas. Por favor revise los datos.' });
         }
-        console.log('FECHAS VALIDAS');
+
         const reservasExistentes = await reserveModel.verificarDisponibilidadVehiculo(id_vehiculo, fechaDesde, fechaHasta);
         if (reservasExistentes.length > 0) {
             return res.status(409).json({ error: 'El auto no está disponible en el período ingresado.' });
         }
-        console.log('AUTO DISPONIBLE');
+
         const vehiculoEnSucursal = await reserveModel.obtenerVehiculoEnSucursal(id_vehiculo, sucursal_retiro_id);
         if (!vehiculoEnSucursal) {
             return res.status(400).json({ error: 'El auto no está disponible para la sucursal seleccionada.' });
         }
-        console.log('EL AUTO ESTA EN LA SUCURSAL CORRECTA');
+
         let conductor = await reserveModel.buscarConductorPorLicencia(licencia);
         let conductorId;
-        let fechaNacimiento;
 
         if (conductor) {
             conductorId = conductor.id_conductor;
-            fechaNacimiento = dayjs(conductor.fechaN);
         } else {
-            fechaNacimiento = dayjs(fechaN);
+            if (!fechaN || !dayjs(fechaN, 'YYYY-MM-DD', true).isValid()) {
+                return res.status(400).json({ error: 'La fecha de nacimiento es inválida.' });
+            }
+
+            const fechaNacimiento = dayjs(fechaN);
             const hoy = dayjs();
             const edad = hoy.diff(fechaNacimiento, 'year');
 
@@ -128,14 +130,14 @@ const reserveVehicle = async (req, res) => {
 
             conductorId = await reserveModel.crearConductor(licencia, nombre, apellido, fechaN);
         }
-        console.log('CONDUCTOR CREADO O ENCONTRADO Y CON LA EDAD CORRECTA');
+
         if (!licencia) {
             return res.status(400).json({ error: 'La licencia de conducir es inválida. Revise los datos.' });
         }
 
         const reservasActivas = await reserveModel.obtenerReservasActivasConductor(licencia, fechaDesde, fechaHasta);
         if (reservasActivas.length > 0) {
-            return res.status(409).json({ error: 'El conductor ya está asignado a otra reserva activa. Revise los datos.' });
+            return res.status(409).json({ error: 'El conductor ya está asignado a otra reserva activa. Revise las fechas.' });
         }
 
         const reservaId = await reserveModel.crearReserva({
