@@ -30,3 +30,5 @@ coverage/
 # Archivos generados por Postman
 *.postman_collection.json
 *.postman_environment.json
+
+docker-compose.yml
