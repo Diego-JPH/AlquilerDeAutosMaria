@@ -1,13 +1,5 @@
-import React from 'react'
-//import UserList from './components/UserList'
+import AppRouter from "./router";
 
-function App() {
-  return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Alquileres de autos Maria #TETAS</h1>
-      {/* <UserList /> */}
-    </div>
-  )
+export default function App() {
+  return <AppRouter />;
 }
-
-export default App
