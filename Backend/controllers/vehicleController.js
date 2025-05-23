@@ -2,10 +2,16 @@ const db = require('../config/db');
 
 const updateVehicle = async (req, res) => {
   const { patente } = req.params;
-  const { precioPorDia, ultimoMantenimiento } = req.body;
+  const { precioPorDia, ultimoMantenimiento, estado } = req.body;
 
   if (precioPorDia === undefined && !ultimoMantenimiento) {
     return res.status(400).json({ error: 'Debe enviar al menos precioPorDia o ultimoMantenimiento en el body' });
+  }
+
+  // Validar el estado si fue enviado
+  const estadosValidos = ['ocupado', 'disponible', 'mantenimiento'];
+  if (estado && !estadosValidos.includes(estado)) {
+    return res.status(400).json({ error: 'Estado invalido. Deber ser ocupado, mantenimiento o disponible'})
   }
 
   try {
@@ -23,6 +29,11 @@ const updateVehicle = async (req, res) => {
       valores.push(ultimoMantenimiento);
     }
 
+    if (estado) {
+      campos.push('estado = ?');
+      valores.push(estado);
+    }
+
     valores.push(patente); // La patente siempre va al final
 
     const sql = `UPDATE Vehiculo SET ${campos.join(', ')} WHERE patente = ?`;
@@ -37,7 +48,8 @@ const updateVehicle = async (req, res) => {
       message: 'Vehículo actualizado correctamente',
       patente,
       ...(precioPorDia !== undefined && { nuevoPrecio: precioPorDia }),
-      ...(ultimoMantenimiento && { nuevoUltimoMantenimiento: ultimoMantenimiento })
+      ...(ultimoMantenimiento && { nuevoUltimoMantenimiento: ultimoMantenimiento }),
+      ...(estado && { nuevoEstado: estado})
     });
   } catch (error) {
     console.error('Error actualizando vehículo:', error);
@@ -124,10 +136,22 @@ const deleteVehicle = async (req, res) => {
   const { patente } = req.params;
 
   try {
+
+    const [vehiculoRows] = await db.query(
+      'SELECT id_vehiculo FROM Vehiculo WHERE patente = ?',
+      [patente]
+    );
+
+    if (vehiculoRows.length === 0) {
+      return res.status(404).json({ error: 'Vehículo no encontrado' });
+    }
+
+    const vehiculoId = vehiculoRows[0].id;
+
     // Verificar si el vehículo está en una reserva activa
     const [reservas] = await db.query(
-      `SELECT * FROM Reserva WHERE patente = ? AND estado = 'activa'`,
-      [patente]
+      `SELECT * FROM Reserva WHERE id_vehiculo = ? AND estado = 'activa'`,
+      [vehiculoId]
     );
 
     if (reservas.length > 0) {
@@ -153,4 +177,3 @@ module.exports = {
   insertVehicle,
   deleteVehicle,
 };
-// hola
