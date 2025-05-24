@@ -4,8 +4,8 @@ const updateVehicle = async (req, res) => {
   const { patente } = req.params;
   const { precioPorDia, ultimoMantenimiento, estado } = req.body;
 
-  if (precioPorDia === undefined && !ultimoMantenimiento) {
-    return res.status(400).json({ error: 'Debe enviar al menos precioPorDia o ultimoMantenimiento en el body' });
+  if (!estado && precioPorDia === undefined && !ultimoMantenimiento) {
+    return res.status(400).json({ error: 'Debe enviar al menos precioPorDia, ultimoMantenimiento o un estado en el body' });
   }
 
   // Validar el estado si fue enviado
@@ -136,7 +136,6 @@ const deleteVehicle = async (req, res) => {
   const { patente } = req.params;
 
   try {
-
     const [vehiculoRows] = await db.query(
       'SELECT id_vehiculo FROM Vehiculo WHERE patente = ?',
       [patente]
@@ -146,7 +145,7 @@ const deleteVehicle = async (req, res) => {
       return res.status(404).json({ error: 'Vehículo no encontrado' });
     }
 
-    const vehiculoId = vehiculoRows[0].id;
+    const vehiculoId = vehiculoRows[0].id_vehiculo;
 
     // Verificar si el vehículo está en una reserva activa
     const [reservas] = await db.query(

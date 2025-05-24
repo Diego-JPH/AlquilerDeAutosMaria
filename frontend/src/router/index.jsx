@@ -3,6 +3,7 @@ import Home from "../pages/Home";
 import MainLayout from "../layouts/MainLayout";
 import RegisterPage from "../pages/RegisterPage"; 
 import CreateReserve from "../pages/CreateReserve"
+import ManageVehicles from "../pages/ManageVehicles";
 
 export default function AppRouter() {
   return (
@@ -12,6 +13,7 @@ export default function AppRouter() {
           <Route path="/" element={<Home />} />
           <Route path="/registerPage" element={<RegisterPage />} />
           <Route path="/create-reserve" element={<CreateReserve />} />
+          <Route path="/manageVehicles" element={<ManageVehicles />} />
         </Routes>
       </MainLayout>
     </Router>
