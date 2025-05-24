@@ -11,42 +11,70 @@ export default function VehicleManager() {
   const [patenteDelete, setPatenteDelete] = useState('');
 
   const handleUpdate = async () => {
-    if (!patenteUpdate) {
-      alert('Debés ingresar una patente para actualizar');
+  const trimmedPatente = patenteUpdate.trim();
+  if (!trimmedPatente) {
+    alert('Debés ingresar una patente para actualizar');
+    return;
+  }
+
+  const body = {};
+  if (precioPorDia) body.precioPorDia = parseFloat(precioPorDia);
+  if (ultimoMantenimiento) body.ultimoMantenimiento = ultimoMantenimiento;
+  if (estado) body.estado = estado;
+
+  // Validar que se haya ingresado al menos un campo para actualizar
+  if (Object.keys(body).length === 0) {
+    alert('Debés ingresar al menos un campo para actualizar (precio, estado o fecha)');
+    return;
+  }
+
+  try {
+    const res = await fetch(`http://localhost:3000/api/vehicles/${trimmedPatente}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || 'Error al actualizar el vehículo');
       return;
     }
 
-    const body = {};
-    if (precioPorDia) body.precioPorDia = parseFloat(precioPorDia);
-    if (ultimoMantenimiento) body.ultimoMantenimiento = ultimoMantenimiento;
-    if (estado) body.estado = estado;
-
-    try {
-      const res = await fetch(`http://localhost:3000/vehiculos/${patenteUpdate}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      alert(data.message || data.error);
-    } catch (err) {
-      console.error(err);
-      alert('Error actualizando vehículo');
-    }
-  };
+    alert(data.message || 'Vehículo actualizado con éxito');
+    // Opcional: limpiar campos
+    setPrecioPorDia('');
+    setUltimoMantenimiento('');
+    setEstado('');
+    setPatenteUpdate('');
+  } catch (err) {
+    console.error(err);
+    alert('Error actualizando vehículo');
+  }
+};
 
   const handleDelete = async () => {
-    if (!patenteDelete) {
+    const trimmedPatente = patenteDelete.trim();
+    if (!trimmedPatente) {
       alert('Debés ingresar una patente para eliminar');
       return;
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/vehiculos/${patenteDelete}`, {
+      const res = await fetch(`http://localhost:3000/api/vehicles/${trimmedPatente}`, {
         method: 'DELETE',
       });
+
       const data = await res.json();
-      alert(data.message || data.error);
+
+      if (!res.ok) {
+        alert(data.error || 'No se pudo eliminar el vehículo');
+        return;
+      }
+
+      alert(data.message || 'Vehículo eliminado con éxito');
+      setPatenteDelete('');
     } catch (err) {
       console.error(err);
       alert('Error eliminando vehículo');
