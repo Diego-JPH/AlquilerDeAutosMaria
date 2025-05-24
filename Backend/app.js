@@ -1,11 +1,12 @@
 const express = require('express');
 const app = express();
-
+const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const reserveRoutes = require('./routes/reserveRoutes'); //importa las rutas de reservas
 require('dotenv').config();
 const vehicleRoutes = require('./routes/vehicleRoutes');
 
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
 app.use('/api/reserve', reserveRoutes);
