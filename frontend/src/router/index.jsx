@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
+import LoginPage from "../pages/LoginPage";
 import MainLayout from "../layouts/MainLayout";
 import RegisterPage from "../pages/RegisterPage"; 
 import CreateReserve from "../pages/CreateReserve"
@@ -14,6 +15,7 @@ export default function AppRouter() {
           <Route path="/registerPage" element={<RegisterPage />} />
           <Route path="/create-reserve" element={<CreateReserve />} />
           <Route path="/manageVehicles" element={<ManageVehicles />} />
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </MainLayout>
     </Router>

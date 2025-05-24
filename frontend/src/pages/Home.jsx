@@ -17,11 +17,6 @@ export default function Home() {
             </li>
           ))}
         </ul>
-        <Link to="/registerPage">
-          <button className="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md">
-            Ir a Registro
-          </button>
-        </Link>
       </main>
     </div>
   );
