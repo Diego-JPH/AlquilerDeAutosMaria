@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import MainLayout from "../layouts/MainLayout";
 import RegisterPage from "../pages/RegisterPage"; 
+import ManageVehicles from "../pages/ManageVehicles";
 
 export default function AppRouter() {
   return (
@@ -10,6 +11,7 @@ export default function AppRouter() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/registerPage" element={<RegisterPage />} />
+          <Route path="/manageVehicles" element={<ManageVehicles />} />
         </Routes>
       </MainLayout>
     </Router>
