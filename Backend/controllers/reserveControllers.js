@@ -148,8 +148,20 @@ const reserveVehicle = async (req, res) => {
     }
 };
 
+const listReserveOfUser = async (req, res) => {
+    const idUsuario = req.usuario.id;
+    try {
+        const reservas = await reserveModel.getReservationsPerUser(idUsuario);
+        res.status(200).json(reservas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error al obtener las reservas del usuario" });
+    }
+};
+
 module.exports = {
     changeDriver,
     cancelReserve,
-    reserveVehicle
+    reserveVehicle,
+    listReserveOfUser
 };

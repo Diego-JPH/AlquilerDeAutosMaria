@@ -166,6 +166,34 @@ const crearReserva = async ({
     return result.insertId;
 };
 
+const getReservationsPerUser = async (idUsuario) => {
+    const [rows] = await db.execute(
+        `SELECT
+    r.id_reserva AS id,
+    r.fechaDesde,
+    r.fechaHasta,
+    r.estado,
+    c.nombre AS nombre_conductor,
+    c.apellido AS apellido_conductor,
+    s_entrega.sucursal AS sucursal_entrega,
+    ma.marca,
+    mo.modelo
+FROM Reserva r
+LEFT JOIN Conductor c ON r.id_conductor = c.id_conductor
+JOIN Sucursal s_entrega ON r.id_sucursal_entrega = s_entrega.id_sucursal
+JOIN Vehiculo v ON r.id_vehiculo = v.id_vehiculo
+JOIN Modelo mo ON v.id_modelo = mo.id_modelo
+JOIN Marca ma ON mo.id_marca = ma.id_marca
+WHERE r.id_usuario = ?
+ORDER BY r.fechaDesde DESC;
+`,
+        [idUsuario]
+    );
+    return rows;
+};
+
+
+
 module.exports = {
     eliminarConductor,
     crearConductor,
@@ -185,5 +213,6 @@ module.exports = {
     buscarConductorPorLicencia,
     obtenerReservasActivasConductor,
     crearReserva,
-    obtenerEstadoReserva
+    obtenerEstadoReserva,
+    getReservationsPerUser
 };
