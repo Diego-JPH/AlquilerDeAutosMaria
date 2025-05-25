@@ -4,12 +4,12 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 export default function Header() {
   const [logueado, setLogueado] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // 👈 detecta cambios de ruta
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     setLogueado(!!token);
-  }, [location.pathname]); // 👈 se ejecuta cada vez que cambia la URL
+  }, [location.pathname]); // se ejecuta cada vez que cambia la URL
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -19,7 +19,9 @@ export default function Header() {
 
   return (
     <header className="bg-green-900 text-white p-4 md:flex md:justify-between md:items-center">
-      <h1 className="text-xl md:text-2xl font-bold">Alquiler de Autos María</h1>
+      <Link to="/" className="text-xl md:text-2xl font-bold hover:underline cursor-pointer">
+        Alquiler de Autos María
+      </Link>
       <nav className="flex flex-col md:flex-row gap-2 md:gap-4 mt-2 md:mt-0">
         {!logueado && (
           <>

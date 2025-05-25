@@ -1,7 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
+import LoginPage from "../pages/LoginPage";
 import MainLayout from "../layouts/MainLayout";
 import RegisterPage from "../pages/RegisterPage";
+import CreateReserve from "../pages/CreateReserve"
+import ManageVehicles from "../pages/ManageVehicles";
 import ReservePage from "../pages/ReservePage";
 
 export default function AppRouter() {
@@ -11,6 +14,9 @@ export default function AppRouter() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/registerPage" element={<RegisterPage />} />
+          <Route path="/create-reserve" element={<CreateReserve />} />
+          <Route path="/manageVehicles" element={<ManageVehicles />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/reserve" element={<ReservePage />} />
         </Routes>
       </MainLayout>
