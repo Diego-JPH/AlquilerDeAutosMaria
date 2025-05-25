@@ -15,7 +15,6 @@ export default function ReservePage() {
     const [mensaje, setMensaje] = useState("");
 
     useEffect(() => {
-        localStorage.setItem("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sIjoiY2xpZW50ZSIsIm5vbWJyZSI6IkRpZWdvIiwiaWF0IjoxNzQ4MTkyMTQ2LCJleHAiOjE3NDgxOTU3NDZ9.xy68VBYchDdc5v1tUnrQ1thAPl4jgqHsQia80Zt6j9M");
         const token = localStorage.getItem("token");
 
         if (!token) {
