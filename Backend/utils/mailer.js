@@ -12,7 +12,8 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendRecoveryEmail = async (to, token) => {
-  const link = `http://localhost:3000/reset-password?token=${token}`;
+  const link = token;
+  console.log("🔐 Token generado:", token); // <-- Acá sí ves el hash simple
 
   await transporter.sendMail({
     from: `"Alquiler de Autos María" <alquileresdeautosmaria@gmail.com>`,

@@ -1,9 +1,10 @@
-const pool = require('../config/db');
+const pool = require('../../config/db');
 const bcrypt = require('bcrypt');
 
 const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
+  console.log('🔐 Token recibido:', token);
   try {
     const [rows] = await pool.query(
       'SELECT * FROM tokens_recuperacion WHERE token = ?',
@@ -24,7 +25,7 @@ const resetPassword = async (req, res) => {
 
     // Obtener id_usuario desde email
     const [userRows] = await pool.query(
-      'SELECT id_usuario FROM usuario WHERE email = ?',
+      'SELECT id_usuario FROM Usuario WHERE email = ?',
       [tokenData.email]
     );
 
@@ -33,11 +34,11 @@ const resetPassword = async (req, res) => {
     }
 
     const id_usuario = userRows[0].id_usuario;
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    //const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await pool.query(
-      'UPDATE cliente SET contraseña = ? WHERE id_usuario = ?',
-      [hashedPassword, id_usuario]
+      'UPDATE Usuario SET contraseña = ? WHERE id_usuario = ?',
+      [newPassword, id_usuario]
     );
 
     await pool.query('DELETE FROM tokens_recuperacion WHERE token = ?', [token]);
