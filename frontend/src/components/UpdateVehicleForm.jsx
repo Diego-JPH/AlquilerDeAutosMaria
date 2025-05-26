@@ -9,8 +9,19 @@ export default function UpdateVehicleForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!patente || !precioPorDia || !ultimoMantenimiento || !estado) {
-      alert('Todos los campos son obligatorios');
+    if (!patente) {
+      alert('Debe ingresar una patente');
+      return;
+    }
+
+    // Construir el cuerpo dinámicamente
+    const body = {};
+    if (precioPorDia !== '') body.precioPorDia = precioPorDia;
+    if (ultimoMantenimiento !== '') body.ultimoMantenimiento = ultimoMantenimiento;
+    if (estado !== '') body.estado = estado;
+
+    if (Object.keys(body).length === 0) {
+      alert('Debe ingresar al menos 1 dato a actualizar');
       return;
     }
 
@@ -18,11 +29,7 @@ export default function UpdateVehicleForm() {
       const res = await fetch(`http://localhost:3000/api/vehicles/${patente}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          precioPorDia,
-          ultimoMantenimiento,
-          estado,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -39,7 +46,6 @@ export default function UpdateVehicleForm() {
       setPrecioPorDia('');
       setUltimoMantenimiento('');
       setEstado('');
-
     } catch (err) {
       console.error(err);
       alert('Error al actualizar el vehículo');
@@ -59,13 +65,13 @@ export default function UpdateVehicleForm() {
         />
         <input
           type="number"
-          placeholder="Nuevo Precio por Día *"
+          placeholder="Nuevo Precio por Día"
           value={precioPorDia}
           onChange={(e) => setPrecioPorDia(e.target.value)}
           className="p-2 rounded text-black"
         />
         <div>
-          <label className="block text-sm mb-1">Fecha de último mantenimiento *</label>
+          <label className="block text-sm mb-1">Fecha de último mantenimiento</label>
           <input
             type="date"
             value={ultimoMantenimiento}
@@ -74,7 +80,7 @@ export default function UpdateVehicleForm() {
           />
         </div>
         <div>
-          <label className="block text-sm mb-1">Estado *</label>
+          <label className="block text-sm mb-1">Estado</label>
           <select
             value={estado}
             onChange={(e) => setEstado(e.target.value)}
@@ -88,7 +94,7 @@ export default function UpdateVehicleForm() {
         </div>
         <button
           type="submit"
-          className="bg-white text-green-900 font-bold px-4 py-2 rounded hover:bg-gray-200"
+          className="bg-green-500 text-white font-bold px-4 py-2 rounded hover:bg-green-600"
         >
           Actualizar Vehículo
         </button>

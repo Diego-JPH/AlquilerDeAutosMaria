@@ -112,7 +112,7 @@ export default function InsertVehicleForm() {
         </div>
 
         <div className="md:col-span-2">
-          <button type="submit" className="bg-white text-green-900 font-bold px-4 py-2 rounded hover:bg-gray-200 w-full">
+          <button type="submit" className="bg-green-500 text-white font-bold px-4 py-2 rounded hover:bg-green-600">
             Agregar Vehículo
           </button>
         </div>

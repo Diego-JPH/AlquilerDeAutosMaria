@@ -47,7 +47,7 @@ export default function DeleteVehicleForm() {
         </div>
         <button
           type="submit"
-          className="bg-white text-green-900 font-bold px-4 py-2 rounded hover:bg-gray-200"
+          className="bg-red-500 text-white font-bold px-4 py-2 rounded hover:bg-red-600"
         >
           Eliminar Vehículo
         </button>

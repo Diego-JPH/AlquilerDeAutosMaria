@@ -4,40 +4,39 @@ const updateVehicle = async (req, res) => {
   const { patente } = req.params;
   const { precioPorDia, ultimoMantenimiento, estado } = req.body;
 
-  if (!estado && precioPorDia === undefined && !ultimoMantenimiento) {
+  if ((precioPorDia === undefined || precioPorDia === '') &&
+      (ultimoMantenimiento === undefined || ultimoMantenimiento === '') &&
+      (estado === undefined || estado === '')) {
     return res.status(400).json({ error: 'Debe enviar al menos precioPorDia, ultimoMantenimiento o un estado en el body' });
   }
 
-  // Validar el estado si fue enviado
   const estadosValidos = ['ocupado', 'disponible', 'mantenimiento'];
-  if (estado && !estadosValidos.includes(estado)) {
-    return res.status(400).json({ error: 'Estado invalido. Deber ser ocupado, mantenimiento o disponible'})
-  }
 
   try {
-    // Armar dinámicamente los campos a actualizar
     const campos = [];
     const valores = [];
 
-    if (precioPorDia !== undefined) {
+    if (precioPorDia !== undefined && precioPorDia !== '') {
       campos.push('precioPorDia = ?');
       valores.push(precioPorDia);
     }
 
-    if (ultimoMantenimiento) {
+    if (ultimoMantenimiento !== undefined && ultimoMantenimiento !== '') {
       campos.push('ultimo_mantenimiento = ?');
       valores.push(ultimoMantenimiento);
     }
 
-    if (estado) {
+    if (estado !== undefined && estado !== '') {
+      if (!estadosValidos.includes(estado)) {
+        return res.status(400).json({ error: 'Estado invalido. Debe ser ocupado, mantenimiento o disponible' });
+      }
       campos.push('estado = ?');
       valores.push(estado);
     }
 
-    valores.push(patente); // La patente siempre va al final
+    valores.push(patente);
 
     const sql = `UPDATE Vehiculo SET ${campos.join(', ')} WHERE patente = ?`;
-
     const [result] = await db.query(sql, valores);
 
     if (result.affectedRows === 0) {
@@ -47,9 +46,9 @@ const updateVehicle = async (req, res) => {
     res.json({
       message: 'Vehículo actualizado correctamente',
       patente,
-      ...(precioPorDia !== undefined && { nuevoPrecio: precioPorDia }),
+      ...(precioPorDia !== undefined && precioPorDia !== '' && { nuevoPrecio: precioPorDia }),
       ...(ultimoMantenimiento && { nuevoUltimoMantenimiento: ultimoMantenimiento }),
-      ...(estado && { nuevoEstado: estado})
+      ...(estado && estado !== '' && { nuevoEstado: estado })
     });
   } catch (error) {
     console.error('Error actualizando vehículo:', error);
