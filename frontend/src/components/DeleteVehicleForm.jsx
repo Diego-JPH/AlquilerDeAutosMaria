@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function DeleteVehicleForm() {
   const [patente, setPatente] = useState('');
@@ -7,7 +9,7 @@ export default function DeleteVehicleForm() {
     e.preventDefault();
 
     if (!patente) {
-      alert('Debe ingresar la patente');
+      toast.warn('Debe ingresar la patente');
       return;
     }
 
@@ -19,15 +21,15 @@ export default function DeleteVehicleForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || 'Error al eliminar el vehículo');
+        toast.error(data.error || 'Error al eliminar el vehículo');
         return;
       }
 
-      alert(data.message || 'Vehículo eliminado correctamente');
+      toast.success(data.message || 'Vehículo eliminado correctamente');
       setPatente('');
     } catch (err) {
       console.error(err);
-      alert('Error al eliminar el vehículo');
+      toast.error('Error al eliminar el vehículo');
     }
   };
 

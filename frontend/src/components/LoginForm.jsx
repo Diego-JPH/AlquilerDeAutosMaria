@@ -66,7 +66,7 @@ export default function LoginForm() {
         type="button"
         onClick={() => navigate('/recoverPassword')}
         className="bg-green-800 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-md text-lg transition"
-      > recuperar contraseña
+      > Recuperar contraseña
     </button>
     {error && <p className="text-red-500 text-center">{error}</p>}
   </form>

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function InsertVehicleForm() {
   const [form, setForm] = useState({
@@ -22,6 +24,7 @@ export default function InsertVehicleForm() {
         setSucursales(data);
       } catch (err) {
         console.error('Error al cargar sucursales', err);
+        toast.error('Error al cargar sucursales');
       }
     };
 
@@ -37,7 +40,7 @@ export default function InsertVehicleForm() {
 
     const hasEmpty = Object.values(form).some(value => value.trim() === '');
     if (hasEmpty) {
-      alert('Todos los campos son obligatorios');
+      toast.warn('Todos los campos son obligatorios');
       return;
     }
 
@@ -51,11 +54,11 @@ export default function InsertVehicleForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || 'Error al agregar vehículo');
+        toast.error(data.error || 'Error al agregar vehículo');
         return;
       }
 
-      alert(data.message || 'Vehículo agregado correctamente');
+      toast.success(data.message || 'Vehículo agregado correctamente');
 
       setForm({
         patente: '',
@@ -69,19 +72,23 @@ export default function InsertVehicleForm() {
       });
     } catch (err) {
       console.error(err);
-      alert('Error al agregar vehículo');
+      toast.error('Error al agregar vehículo');
     }
   };
 
   return (
     <div className="bg-green-900 text-white p-6 rounded shadow">
+      <ToastContainer position="top-right" autoClose={3000} />
+      
       <h2 className="text-xl font-bold mb-4">Agregar Vehículo</h2>
+
       <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
         <input name="patente" placeholder="Patente *" className="p-2 rounded text-black" value={form.patente} onChange={handleChange} />
         <input name="marca" placeholder="Marca *" className="p-2 rounded text-black" value={form.marca} onChange={handleChange} />
         <input name="modelo" placeholder="Modelo *" className="p-2 rounded text-black" value={form.modelo} onChange={handleChange} />
         <input name="anio" type="number" placeholder="Año *" className="p-2 rounded text-black" value={form.anio} onChange={handleChange} />
         <input name="precioPorDia" type="number" placeholder="Precio por día *" className="p-2 rounded text-black" value={form.precioPorDia} onChange={handleChange} />
+        
         <div>
           <label className="block text-sm mb-1">Fecha de último mantenimiento *</label>
           <input
@@ -92,8 +99,23 @@ export default function InsertVehicleForm() {
             onChange={handleChange}
           />
         </div>
-        <input name="categoria" placeholder="Categoría *" className="p-2 rounded text-black" value={form.categoria} onChange={handleChange} />
-        
+
+        <div>
+          <label className="block text-sm mb-1">Categoría *</label>
+          <select
+            name="categoria"
+            className="p-2 rounded text-black w-full"
+            value={form.categoria}
+            onChange={handleChange}
+          >
+            <option value="">Seleccionar categoría</option>
+            <option value="Suv">Suv</option>
+            <option value="Pick-up">Pick-up</option>
+            <option value="Sedan">Sedan</option>
+            <option value="Economico">Económico</option>
+          </select>
+        </div>
+
         <div>
           <label className="block text-sm mb-1">Sucursal *</label>
           <select
