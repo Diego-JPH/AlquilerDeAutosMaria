@@ -1,5 +1,10 @@
 const db = require('../config/db');
 
+const obtenerTarjetas = async () => {
+    const [tarjetas] = await db.query('SELECT id_tarjeta, numero_tarjeta, titular, saldo FROM TarjetaCredito');
+    return tarjetas;
+};
+
 async function reembolsarATarjeta(idTarjeta, monto) {
     const sql = `
         UPDATE TarjetaCredito
@@ -16,5 +21,6 @@ async function reembolsarATarjeta(idTarjeta, monto) {
 }
 
 module.exports = {
-    reembolsarATarjeta
+    reembolsarATarjeta,
+    obtenerTarjetas
 };
