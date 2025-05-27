@@ -12,11 +12,11 @@ export default function RecuperarContraseniaForm() {
     try {
       // Simulando envío al backend
       await axios.post('http://localhost:3000/api/user/recoverPassword', { email });
-      setMensaje('Si el correo está registrado, te hemos enviado un email para restablecer la contraseña.');
+      setMensaje('Te hemos enviado un email para restablecer la contraseña.');
       setError('');
       setEmail('');
     } catch (err) {
-      const msg = err.response?.data?.mensaje || 'Error al enviar la solicitud';
+      const msg = err.response?.data?.mensaje || 'Correo no registrado';
       setError(msg);
       setMensaje('');
     }
