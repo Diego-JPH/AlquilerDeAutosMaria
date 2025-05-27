@@ -22,7 +22,7 @@ const recoverPassword = async (req, res) => {
 
     const recoveryLink = `http://localhost:3000/reset-password?token=${token}`;
 
-    await sendRecoveryEmail.sendRecoveryEmail(email, recoveryLink);
+    await sendRecoveryEmail(email, recoveryLink);
 
     res.json({ message: 'Correo enviado para recuperar contraseña' });
   } catch (err) {
