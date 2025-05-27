@@ -14,6 +14,7 @@ export default function InsertVehicleForm() {
     sucursal: '',
   });
 
+  const [imagen, setImagen] = useState(null); // Imagen seleccionada
   const [sucursales, setSucursales] = useState([]);
 
   useEffect(() => {
@@ -35,6 +36,10 @@ export default function InsertVehicleForm() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e) => {
+    setImagen(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -44,11 +49,19 @@ export default function InsertVehicleForm() {
       return;
     }
 
+    const formData = new FormData();
+    for (const key in form) {
+      formData.append(key, form[key]);
+    }
+
+    if (imagen) {
+      formData.append('imagen', imagen);
+    }
+
     try {
       const res = await fetch('http://localhost:3000/api/vehicles', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: formData,
       });
 
       const data = await res.json();
@@ -70,6 +83,7 @@ export default function InsertVehicleForm() {
         categoria: '',
         sucursal: '',
       });
+      setImagen(null);
     } catch (err) {
       console.error(err);
       toast.error('Error al agregar vehículo');
@@ -82,7 +96,7 @@ export default function InsertVehicleForm() {
       
       <h2 className="text-xl font-bold mb-4">Agregar Vehículo</h2>
 
-      <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
+      <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit} encType="multipart/form-data">
         <input name="patente" placeholder="Patente *" className="p-2 rounded text-black" value={form.patente} onChange={handleChange} />
         <input name="marca" placeholder="Marca *" className="p-2 rounded text-black" value={form.marca} onChange={handleChange} />
         <input name="modelo" placeholder="Modelo *" className="p-2 rounded text-black" value={form.modelo} onChange={handleChange} />
@@ -131,6 +145,11 @@ export default function InsertVehicleForm() {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="block text-sm mb-1">Imagen del vehículo (opcional)</label>
+          <input type="file" accept="image/*" onChange={handleImageChange} className="p-2 rounded text-black w-full" />
         </div>
 
         <div className="md:col-span-2">
