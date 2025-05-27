@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const pool = require('../../config/db');
-const sendRecoveryEmail = require('../../utils/mailer');
+const { sendRecoveryEmail } = require('../../utils/mailer');
 
 const recoverPassword = async (req, res) => {
   const { email } = req.body;

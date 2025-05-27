@@ -1,8 +1,9 @@
 const userModel = require('../models/userModels');
 const dayjs = require('dayjs');
 const jwt = require('jsonwebtoken');
-
+const generarCodigo = () => Math.floor(1000 + Math.random() * 9000);
 const SECRET_KEY = process.env.JWT_SECRET;
+const { sendVerificationEmail } = require('../utils/mailer');
 
 const registrarCliente = async (req, res) => {
   const { email, nombre, apellido, contraseña, fechaN } = req.body;
@@ -38,6 +39,25 @@ const iniciarSesion = async (req, res) => {
     return res.status(401).json({ mensaje: "El email o la contraseña son incorrectos" });
   }
 
+  // Si el rol es administrador, enviamos un código de verificación
+  if (usuario.rol === 'admin') {
+    const codigo = generarCodigo();
+    const expiracion = Date.now() + 10 * 60 * 1000; // 10 minutos
+
+    try {
+      await userModel.guardarCodigoVerificacion(email, codigo, expiracion);
+      await sendVerificationEmail(email, codigo);
+
+      return res.status(200).json({
+        mensaje: "Código enviado por correo. Ingrese el código para continuar.",
+        requiereCodigo: true
+      });
+    } catch (error) {
+      console.error("Error enviando email:", error);
+      return res.status(500).json({ mensaje: "No se pudo enviar el código de verificación por correo." });
+    }
+  }
+
   // Generar token
   const token = jwt.sign(
     { id: usuario.id_usuario, rol: usuario.rol, nombre: usuario.nombre },
@@ -46,12 +66,64 @@ const iniciarSesion = async (req, res) => {
   );
 
   res.status(200).json({
-    mensaje: "Inicio de sesión exitoso",
-    token
+    token,
+    usuario: {
+      id: usuario.id_usuario,
+      nombre: usuario.nombre,
+      rol: usuario.rol,
+      email: usuario.email
+    }
   });
+};
+
+const verificarCodigo = async (req, res) => {
+  const { email, codigoIngresado } = req.body;
+
+  try {
+    const registro = await userModel.obtenerCodigoVerificacion(email);
+
+    if (!registro) {
+      return res.status(404).json({ mensaje: 'No se encontró un código para este email.' });
+    }
+
+    const { codigo, expiracion } = registro;
+
+    const ahora = Date.now();
+    if (ahora > expiracion) {
+      return res.status(400).json({ mensaje: 'El código ha expirado. Intenta iniciar sesión nuevamente.' });
+    }
+
+    if (parseInt(codigoIngresado) !== parseInt(codigo)) {
+      return res.status(401).json({ mensaje: 'El código ingresado es incorrecto.' });
+    }
+
+    // Si todo está bien, generamos el token y lo devolvemos
+    const usuario = await userModel.findUserByEmail(email);
+    const token = jwt.sign(
+      { id: usuario.id_usuario, rol: usuario.rol, nombre: usuario.nombre },
+      SECRET_KEY,
+      { expiresIn: '1h' }
+    );
+
+    return res.status(200).json({
+      mensaje: 'Verificación exitosa.',
+      token,
+      usuario: {
+        id: usuario.id_usuario,
+        nombre: usuario.nombre,
+        rol: usuario.rol,
+        email: usuario.email
+      }
+    });
+
+  } catch (error) {
+    console.error('Error verificando código:', error);
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
 };
 
 module.exports = {
   registrarCliente,
-  iniciarSesion
+  iniciarSesion,
+  verificarCodigo
 };

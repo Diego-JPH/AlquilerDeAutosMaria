@@ -27,9 +27,27 @@ const findClienteById = async (id_usuario) => {
   return rows[0];
 };
 
+async function guardarCodigoVerificacion(email, codigo, expiracion) {
+  await db.query(`
+    INSERT INTO codigos_verificacion (email, codigo, expiracion)
+    VALUES (?, ?, ?)
+    ON DUPLICATE KEY UPDATE codigo = VALUES(codigo), expiracion = VALUES(expiracion)
+  `, [email, codigo, expiracion]);
+}
+
+async function obtenerCodigoVerificacion(email) {
+  const [rows] = await db.query(
+    'SELECT codigo, expiracion FROM codigos_verificacion WHERE email = ?',
+    [email]
+  );
+  return rows[0];
+}
+
 module.exports = {
   findUserByEmail,
   insertUser,
   insertCliente,
-  findClienteById
+  findClienteById,
+  guardarCodigoVerificacion,
+  obtenerCodigoVerificacion
 };
