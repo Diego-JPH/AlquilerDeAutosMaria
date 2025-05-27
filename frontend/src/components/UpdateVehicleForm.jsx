@@ -7,6 +7,7 @@ export default function UpdateVehicleForm() {
   const [precioPorDia, setPrecioPorDia] = useState('');
   const [ultimoMantenimiento, setUltimoMantenimiento] = useState('');
   const [estado, setEstado] = useState('');
+  const [politicaDevolucion, setPoliticaDevolucion] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,11 +17,11 @@ export default function UpdateVehicleForm() {
       return;
     }
 
-    // Construir el cuerpo dinámicamente
     const body = {};
     if (precioPorDia !== '') body.precioPorDia = precioPorDia;
     if (ultimoMantenimiento !== '') body.ultimoMantenimiento = ultimoMantenimiento;
     if (estado !== '') body.estado = estado;
+    if (politicaDevolucion !== '') body.politicaDevolucion = politicaDevolucion;
 
     if (Object.keys(body).length === 0) {
       toast.warn('Debe ingresar al menos 1 dato a actualizar');
@@ -48,6 +49,7 @@ export default function UpdateVehicleForm() {
       setPrecioPorDia('');
       setUltimoMantenimiento('');
       setEstado('');
+      setPoliticaDevolucion('');
     } catch (err) {
       console.error(err);
       toast.error('Error al actualizar el vehículo');
@@ -93,6 +95,18 @@ export default function UpdateVehicleForm() {
             <option value="ocupado">Ocupado</option>
             <option value="mantenimiento">Mantenimiento</option>
           </select>
+        </div>
+        <div>
+          <label className="block text-sm mb-1">Política de Devolución (%)</label>
+          <input
+            type="number"
+            placeholder="Ej: 100, 50, 0"
+            value={politicaDevolucion}
+            onChange={(e) => setPoliticaDevolucion(e.target.value)}
+            min="0"
+            max="100"
+            className="w-full p-2 rounded text-black"
+          />
         </div>
         <button
           type="submit"

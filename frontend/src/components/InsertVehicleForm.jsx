@@ -12,6 +12,7 @@ export default function InsertVehicleForm() {
     ultimoMantenimiento: '',
     categoria: '',
     sucursal: '',
+    politicaDevolucion: '', // 👈 nuevo campo
   });
 
   const [sucursales, setSucursales] = useState([]);
@@ -44,6 +45,11 @@ export default function InsertVehicleForm() {
       return;
     }
 
+    if (form.politicaDevolucion < 0 || form.politicaDevolucion > 100) {
+      toast.warn('La política de devolución debe ser entre 0 y 100');
+      return;
+    }
+
     try {
       const res = await fetch('http://localhost:3000/api/vehicles', {
         method: 'POST',
@@ -69,6 +75,7 @@ export default function InsertVehicleForm() {
         ultimoMantenimiento: '',
         categoria: '',
         sucursal: '',
+        politicaDevolucion: '', // 👈 limpiar campo también
       });
     } catch (err) {
       console.error(err);
@@ -131,6 +138,20 @@ export default function InsertVehicleForm() {
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className="block text-sm mb-1">Política de devolución (%) *</label>
+          <input
+            name="politicaDevolucion"
+            type="number"
+            min="0"
+            max="100"
+            placeholder="Ej: 100, 50, 0"
+            className="p-2 rounded text-black w-full"
+            value={form.politicaDevolucion}
+            onChange={handleChange}
+          />
         </div>
 
         <div className="md:col-span-2">
