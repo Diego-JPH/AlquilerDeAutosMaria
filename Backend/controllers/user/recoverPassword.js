@@ -20,7 +20,7 @@ const recoverPassword = async (req, res) => {
       [email, token, expiry]
     );
 
-    const recoveryLink = `http://localhost:3000/reset-password?token=${token}`;
+    const recoveryLink = `http://localhost:5173/reset-password?token=${token}`;
 
     await sendRecoveryEmail.sendRecoveryEmail(email, recoveryLink);
 

@@ -1,4 +1,24 @@
 const db = require('../config/db');
+const fs = require('fs');
+const path = require('path');
+
+const saveImage = (file) => {
+  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+
+  const fileName = Date.now() + '-' + file.originalname;
+  const filePath = path.join(uploadsDir, fileName);
+
+  fs.writeFileSync(filePath, file.buffer);
+
+  return `/uploads/${fileName}`; // Ruta pública para servir desde el frontend
+};
+
+module.exports = { saveImage };
+
 
 const updateVehicle = async (req, res) => {
   const { patente } = req.params;
@@ -113,11 +133,18 @@ const insertVehicle = async (req, res) => {
     }
     const idSucursal = sucursalResult[0].id_sucursal;
 
+    // 🖼 Guardar imagen si se subió
+    let imagenPath = null;
+    if (req.file) {
+      imagenPath = saveImage(req.file);
+    }
+
+    // 📝 Inserción con campo imagen
     const [insertVehicleResult] = await db.query(
       `INSERT INTO Vehiculo 
-        (patente, id_modelo, año, precioPorDia, ultimo_mantenimiento, id_categoria, id_sucursal) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [patente, idModelo, anio, precioPorDia, ultimoMantenimiento, idCategoria, idSucursal]
+        (patente, id_modelo, año, precioPorDia, ultimo_mantenimiento, id_categoria, id_sucursal, imagen) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [patente, idModelo, anio, precioPorDia, ultimoMantenimiento, idCategoria, idSucursal, imagenPath]
     );
 
     return res.status(201).json({

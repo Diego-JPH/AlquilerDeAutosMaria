@@ -4,6 +4,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white text-black flex flex-col">
       <main className="flex-1 flex flex-col items-center justify-center text-center p-4">
+        <h1 className="text-4xl font-bold mb-6">Bienvenido a alquileres de autos Maria</h1>
         <h2 className="text-2xl font-bold mb-4">Catálogo de autos</h2>
         <ul className="space-y-4 mb-6">
           {[
@@ -17,11 +18,6 @@ export default function Home() {
             </li>
           ))}
         </ul>
-        <Link to="/registerPage">
-          <button className="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md">
-            Ir a Registro
-          </button>
-        </Link>
       </main>
     </div>
   );

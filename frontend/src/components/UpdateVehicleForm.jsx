@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function UpdateVehicleForm() {
   const [patente, setPatente] = useState('');
@@ -10,7 +12,7 @@ export default function UpdateVehicleForm() {
     e.preventDefault();
 
     if (!patente) {
-      alert('Debe ingresar una patente');
+      toast.warn('La patente es obligatoria');
       return;
     }
 
@@ -21,7 +23,7 @@ export default function UpdateVehicleForm() {
     if (estado !== '') body.estado = estado;
 
     if (Object.keys(body).length === 0) {
-      alert('Debe ingresar al menos 1 dato a actualizar');
+      toast.warn('Debe ingresar al menos 1 dato a actualizar');
       return;
     }
 
@@ -35,11 +37,11 @@ export default function UpdateVehicleForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || 'Error al actualizar el vehículo');
+        toast.error(data.error || 'Error al actualizar el vehículo');
         return;
       }
 
-      alert(data.message || 'Vehículo actualizado correctamente');
+      toast.success(data.message || 'Vehículo actualizado correctamente');
 
       // limpiar formulario
       setPatente('');
@@ -48,7 +50,7 @@ export default function UpdateVehicleForm() {
       setEstado('');
     } catch (err) {
       console.error(err);
-      alert('Error al actualizar el vehículo');
+      toast.error('Error al actualizar el vehículo');
     }
   };
 

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -41,13 +43,12 @@ export default function RegisterForm() {
         contraseña: '',
       });
       setError(false);
-      setErrorMsg('');
-      alert('Cliente registrado con éxito');
+      toast.success('Cliente registrado con éxito');
     } catch (err) {
       console.error('Error al registrar cliente:', err);
       const mensaje = err.response?.data?.mensaje || 'Error al registrar cliente';
       setError(true);
-      setErrorMsg(mensaje);
+      toast.error(mensaje);
     }
   };
 
@@ -79,6 +80,20 @@ export default function RegisterForm() {
         </button>
         {error && <p className="text-red-500 text-center">{errorMsg}</p>}
       </form>
+
+      {/* Toast container para mostrar notificaciones flotantes */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 }

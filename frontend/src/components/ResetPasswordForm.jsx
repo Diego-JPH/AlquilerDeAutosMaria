@@ -37,7 +37,7 @@ export default function ResetPasswordForm() {
       setNewPassword('');
 
       setTimeout(() => {
-        navigate('/login');
+        window.location.href = 'http://localhost:5173/login';
       }, 3000); // redirige al login en 3 segundos
     } catch (err) {
       const msg = err.response?.data?.message || 'Error al actualizar contraseña';
