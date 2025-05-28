@@ -20,7 +20,16 @@ async function reembolsarATarjeta(idTarjeta, monto) {
     }
 }
 
+const obtenerTarjetaPorNumero = async (numero_tarjeta) => {
+    const [rows] = await db.query(
+        'SELECT * FROM TarjetaCredito WHERE numero_tarjeta = ?',
+        [numero_tarjeta]
+    );
+    return rows[0];  // tarjeta o undefined
+};
+
 module.exports = {
     reembolsarATarjeta,
-    obtenerTarjetas
+    obtenerTarjetas,
+    obtenerTarjetaPorNumero
 };
