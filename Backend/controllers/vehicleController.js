@@ -38,6 +38,11 @@ const updateVehicle = async (req, res) => {
     const valores = [];
 
     if (precioPorDia !== undefined && precioPorDia !== '') {
+      if (precioPorDia < 0) {
+        return res.status(400).json({
+          error: 'Precio por dia invalido. Debe ser mayor a 0',
+        });
+      }
       campos.push('precioPorDia = ?');
       valores.push(precioPorDia);
     }
@@ -108,6 +113,18 @@ const insertVehicle = async (req, res) => {
     return res.status(400).json({ error: 'Faltan datos requeridos' });
   }
 
+
+  if (precioPorDia < 0) {
+        return res.status(400).json({
+          error: 'Precio por dia invalido. Debe ser mayor a 0',
+        });
+      }
+  
+    if (politicaDevolucion < 0 || politicaDevolucion > 100) {
+        return res.status(400).json({
+          error: 'Política de devolución inválida. Debe ser de 0 a 100',
+        });
+      }
   
   const politica = parseInt(politicaDevolucion, 10);
   

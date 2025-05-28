@@ -159,8 +159,6 @@ export default function InsertVehicleForm() {
           <input
             name="politicaDevolucion"
             type="number"
-            min="0"
-            max="100"
             placeholder="Ej: 100, 50, 0"
             className="p-2 rounded text-black w-full"
             value={form.politicaDevolucion}
