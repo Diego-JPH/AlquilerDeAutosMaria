@@ -8,6 +8,7 @@ import ManageVehicles from "../pages/ManageVehicles";
 import ReservePage from "../pages/ReservePage";
 import RecoverPasswordPage from "../pages/RecoverPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
+import ClientHomePage from "../pages/ClientHomePage";
 export default function AppRouter() {
   return (
     <Router>
@@ -21,6 +22,7 @@ export default function AppRouter() {
           <Route path="/reserve" element={<ReservePage />} />
           <Route path="/recoverPassword" element={<RecoverPasswordPage/>} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/ClientHome" element={<ClientHomePage/>} />
         </Routes>
       </MainLayout>
     </Router>

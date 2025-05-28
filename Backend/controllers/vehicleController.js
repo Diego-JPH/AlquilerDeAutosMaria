@@ -1,23 +1,7 @@
 const db = require('../config/db');
 const fs = require('fs');
 const path = require('path');
-
-const saveImage = (file) => {
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
-
-  const fileName = Date.now() + '-' + file.originalname;
-  const filePath = path.join(uploadsDir, fileName);
-
-  fs.writeFileSync(filePath, file.buffer);
-
-  return `/uploads/${fileName}`; // Ruta pública para servir desde el frontend
-};
-
-module.exports = { saveImage };
+const { saveImage } = require('../models/saveImage'); // Ajustá el path si está en otra carpeta
 
 
 const updateVehicle = async (req, res) => {
@@ -197,8 +181,18 @@ const deleteVehicle = async (req, res) => {
   }
 };
 
+const getVehicles = async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT v.*, m.modelo AS modelo, ma.marca AS marca FROM Vehiculo v JOIN Modelo m ON v.id_modelo = m.id_modelo JOIN Marca ma ON m.id_marca = ma.id_marca');
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error al obtener los vehiculos:', error);
+    res.status(500).json({ error: 'Error al obtener los vehiculos' });
+  }
+};
 module.exports = {
   updateVehicle,
   insertVehicle,
   deleteVehicle,
+  getVehicles,
 };

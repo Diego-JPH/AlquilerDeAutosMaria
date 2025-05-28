@@ -18,7 +18,7 @@ export default function LoginForm() {
       const res = await axios.post('http://localhost:3000/api/user/login', formData);
       localStorage.setItem('token', res.data.token);
       setError('');
-      navigate('/');
+      navigate('/ClientHome');
       window.location.reload();
     } catch (err) {
       const msg = err.response?.data?.mensaje || 'Error al iniciar sesión';

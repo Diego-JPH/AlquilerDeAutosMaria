@@ -76,7 +76,7 @@ export default function ResetPasswordForm() {
             newPassword ? 'bg-green-800 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'
           } text-white font-bold py-3 px-6 rounded-md text-lg transition`}
         >
-          Enviar Contraseña
+          Guardar Contraseña
         </button>
 
         {mensaje && <p className="text-green-700 text-center">{mensaje}</p>}

@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 export default function FormularioReserva() {
-  const idUsuario = 1; // <- Hardcodeado
-  const idVehiculo = 1; // <- Hardcodeado
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const idVehiculo = queryParams.get("idVehiculo");
+  const sucursalRetiro = queryParams.get("idSucursal");
+  const idUsuario = 3; // <- Hardcodeado
+  const token = localStorage.getItem('token');
+
+  
   const [formData, setFormData] = useState({
     fecha_inicio: "",
     fecha_fin: "",
@@ -42,7 +49,7 @@ export default function FormularioReserva() {
       id_usuario: idUsuario,
       fechaDesde: formData.fecha_inicio,
       fechaHasta: formData.fecha_fin,
-      sucursal_retiro_id: parseInt(formData.sucursal_retiro_id),
+      sucursal_retiro_id: sucursalRetiro,
       sucursal_entrega_id: parseInt(formData.sucursal_entrega_id),
       nombre: formData.nombre,
       apellido: formData.apellido,
@@ -85,24 +92,6 @@ export default function FormularioReserva() {
           className="w-full border rounded px-3 py-2"
           required
         />
-      </div>
-
-      <div className="mb-4">
-        <label htmlFor="sucursal_retiro_id" className="block text-gray-700 mb-2">Sucursal de retiro *</label>
-        <select
-          name="sucursal_retiro_id"
-          value={formData.sucursal_retiro_id}
-          onChange={handleChange}
-          className="w-full border rounded px-3 py-2"
-          required
-        >
-          <option value="">Seleccione una sucursal</option>
-          {sucursales.map((sucursal) => (
-            <option key={sucursal.id_sucursal} value={sucursal.id_sucursal}>
-              {sucursal.sucursal}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div className="mb-4">
