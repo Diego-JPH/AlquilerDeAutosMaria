@@ -144,7 +144,7 @@ const obtenerReservasActivasConductor = async (licencia, fechaDesde, fechaHasta)
     AND NOT (r.fechaHasta < ? OR r.fechaDesde > ?)`,
         [licencia, fechaDesde, fechaHasta]
     );
-    return result;
+    return result || null;
 };
 
 const crearReserva = async ({

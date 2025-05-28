@@ -13,45 +13,37 @@ const changeDriver = async (req, res) => {
 
     try {
         const reserva = await reserveModel.obtenerReservaPorId(idReserva);
-        if (!reserva) return res.status(404).json({ error: 'Reserva no encontrada.' });
-
-        if ((reserva.estado === 'cancelada') || (reserva.estado === 'finalizada')) {
-            return res.status(400).json({ error: 'La reserva ya se encuentra finalizada o cancelada.' });
-        }
-
-        const hoy = dayjs();
-        const fechaDesde = dayjs(reserva.fechaDesde);
-        const fechaHasta = dayjs(reserva.fechaHasta);
-
-        if (hoy.isAfter(fechaDesde) && hoy.isBefore(fechaHasta.add(1, 'day'))) {
-            return res.status(400).json({
-                error: 'La reserva se encuentra actualmente en curso, por lo que no se puede cambiar el conductor.'
-            });
-        }
-
-        const licenciaExistente = await driverModel.buscarPorLicencia(licencia);
-        if (licenciaExistente) {
-            return res.status(400).json({ error: 'La licencia ya está asociada a otro conductor.' });
-        }
-
-        const viejoId = await reserveModel.obtenerIdConductorPorReserva(idReserva);
-        if (!viejoId) {
+        if (!reserva) {
             return res.status(404).json({ error: 'Reserva no encontrada.' });
         }
 
-        const nuevoId = await reserveModel.crearConductor(licencia, nombre, apellido, fechaNacimiento);
+        const tieneReservaActiva = await reserveModel.licenciaConReservaActiva(licencia);
+        if (tieneReservaActiva) {
+            return res.status(400).json({ error: 'La licencia ya está asociada a una reserva activa.' });
+        }
 
-        await reserveModel.actualizarConductor(idReserva, nuevoId);
+        let conductor = await reserveModel.buscarConductorPorLicencia(licencia);
+        let nuevoIdConductor;
 
-        await reserveModel.eliminarConductorSiNoTieneReservas(viejoId);
+        if (!conductor) {
+            // Si no existe, lo creo
+            nuevoIdConductor = await reserveModel.crearConductor(licencia, nombre, apellido, fechaNacimiento);
+        } else {
+            // Si ya existe, uso su id
+            nuevoIdConductor = conductor.id_conductor;
+        }
+
+        // Actualizar reserva con nuevo conductor
+        await reserveModel.actualizarConductor(idReserva, nuevoIdConductor);
 
         return res.status(200).json({ mensaje: 'Conductor actualizado correctamente.' });
 
     } catch (error) {
-        console.error(error);
+        console.error('Error al cambiar conductor:', error);
         return res.status(500).json({ error: 'Error interno del servidor.' });
     }
 };
+
 
 const cancelReserve = async (req, res) => {
     const { idReserva, motivo, tipoCancelacion, numero_tarjeta, monto } = req.body;
