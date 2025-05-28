@@ -8,6 +8,7 @@ const userRoutes = require('./routes/userRoutes');
 const reserveRoutes = require('./routes/reserveRoutes');
 const sucursalesRoutes = require('./routes/sucursales');
 const vehicleRoutes = require('./routes/vehicleRoutes');
+const creditCardRoutes = require('./routes/creditCardRoutes');
 
 // Configuración básica
 app.use(cors({ origin: 'http://localhost:5173' }));
@@ -16,9 +17,10 @@ app.use('/uploads', express.static('public/uploads'));
 
 // Rutas de la API
 app.use('/api/reserve', reserveRoutes);
-app.use('/api/user', userRoutes); 
+app.use('/api/user', userRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/sucursales', sucursalesRoutes);
+app.use('/api/tarjetas', creditCardRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

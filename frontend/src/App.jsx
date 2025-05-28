@@ -12,9 +12,9 @@ export default function App() {
   const handleLogin = () => setIsLoggedIn(true);
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('rol');
     setIsLoggedIn(false);
   };
 
-  return <AppRouter isLoggedIn={isLoggedIn} onLogin={handleLogin} onLogout={handleLogout} />;
+  return <AppRouter isLoggedIn={isLoggedIn} onLogout={handleLogout} />;
 }
-// This code initializes the main application component, managing the login state and rendering the router with the necessary props for authentication. It checks for a token in local storage to determine if the user is logged in and provides functions to handle login and logout actions. The `AppRouter` component is responsible for defining the application's routes and layouts.

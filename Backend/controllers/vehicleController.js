@@ -6,11 +6,12 @@ const { saveImage } = require('../models/saveImage'); // Ajustá el path si est�
 
 const updateVehicle = async (req, res) => {
   const { patente } = req.params;
-  const { precioPorDia, ultimoMantenimiento, estado } = req.body;
+  const { precioPorDia, ultimoMantenimiento, estado , politicaDevolucion} = req.body;
 
   if ((precioPorDia === undefined || precioPorDia === '') &&
       (ultimoMantenimiento === undefined || ultimoMantenimiento === '') &&
-      (estado === undefined || estado === '')) {
+      (estado === undefined || estado === '') &&
+      (politicaDevolucion === undefined || politicaDevolucion === '')) {
     return res.status(400).json({ error: 'Debe enviar al menos precioPorDia, ultimoMantenimiento o un estado en el body' });
   }
 
@@ -21,6 +22,11 @@ const updateVehicle = async (req, res) => {
     const valores = [];
 
     if (precioPorDia !== undefined && precioPorDia !== '') {
+      if (precioPorDia < 0) {
+        return res.status(400).json({
+          error: 'Precio por dia invalido. Debe ser mayor a 0',
+        });
+      }
       campos.push('precioPorDia = ?');
       valores.push(precioPorDia);
     }
@@ -38,6 +44,17 @@ const updateVehicle = async (req, res) => {
       valores.push(estado);
     }
 
+    if (politicaDevolucion !== undefined && politicaDevolucion !== '') {
+      const porcentaje = parseInt(politicaDevolucion, 10);
+      if (porcentaje < 0 || porcentaje > 100) {
+        return res.status(400).json({
+          error: 'Política de devolución inválida. Debe ser de 0 a 100',
+        });
+      }
+      campos.push('politica_devolucion = ?');
+      valores.push(politicaDevolucion);
+    }
+
     valores.push(patente);
 
     const sql = `UPDATE Vehiculo SET ${campos.join(', ')} WHERE patente = ?`;
@@ -52,7 +69,8 @@ const updateVehicle = async (req, res) => {
       patente,
       ...(precioPorDia !== undefined && precioPorDia !== '' && { nuevoPrecio: precioPorDia }),
       ...(ultimoMantenimiento && { nuevoUltimoMantenimiento: ultimoMantenimiento }),
-      ...(estado && estado !== '' && { nuevoEstado: estado })
+      ...(estado && estado !== '' && { nuevoEstado: estado }),
+      ...(politicaDevolucion && politicaDevolucion !== '' && { nuevaPolitica: politicaDevolucion }),
     });
   } catch (error) {
     console.error('Error actualizando vehículo:', error);
@@ -71,12 +89,29 @@ const insertVehicle = async (req, res) => {
     precioPorDia,
     ultimoMantenimiento,
     categoria,
-    sucursal
+    sucursal,
+    politicaDevolucion // 🆕 agregado
   } = req.body;
 
-  if (!patente || !marca || !modelo || !anio || !precioPorDia || !ultimoMantenimiento || !categoria || !sucursal) {
+  if (!patente || !marca || !modelo || !anio || !precioPorDia || !ultimoMantenimiento || !categoria || !sucursal || politicaDevolucion === undefined) {
     return res.status(400).json({ error: 'Faltan datos requeridos' });
   }
+
+
+  if (precioPorDia < 0) {
+        return res.status(400).json({
+          error: 'Precio por dia invalido. Debe ser mayor a 0',
+        });
+      }
+  
+    if (politicaDevolucion < 0 || politicaDevolucion > 100) {
+        return res.status(400).json({
+          error: 'Política de devolución inválida. Debe ser de 0 a 100',
+        });
+      }
+  
+  const politica = parseInt(politicaDevolucion, 10);
+  
 
   try {
     const [existingVehicle] = await db.query('SELECT * FROM Vehiculo WHERE patente = ?', [patente]);
@@ -126,9 +161,9 @@ const insertVehicle = async (req, res) => {
     // 📝 Inserción con campo imagen
     const [insertVehicleResult] = await db.query(
       `INSERT INTO Vehiculo 
-        (patente, id_modelo, año, precioPorDia, ultimo_mantenimiento, id_categoria, id_sucursal, imagen) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [patente, idModelo, anio, precioPorDia, ultimoMantenimiento, idCategoria, idSucursal, imagenPath]
+        (patente, id_modelo, año, precioPorDia, ultimo_mantenimiento, id_categoria, id_sucursal, politica_devolucion, imagen) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [patente, idModelo, anio, precioPorDia, ultimoMantenimiento, idCategoria, idSucursal, politica, imagenPath]
     );
 
     return res.status(201).json({

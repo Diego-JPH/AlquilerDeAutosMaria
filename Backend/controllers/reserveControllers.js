@@ -12,14 +12,26 @@ const changeDriver = async (req, res) => {
     }
 
     try {
+        const reserva = await reserveModel.obtenerReservaPorId(idReserva);
+        if (!reserva) return res.status(404).json({ error: 'Reserva no encontrada.' });
+
+        if ((reserva.estado === 'cancelada') || (reserva.estado === 'finalizada')) {
+            return res.status(400).json({ error: 'La reserva ya se encuentra finalizada o cancelada.' });
+        }
+
+        const hoy = dayjs();
+        const fechaDesde = dayjs(reserva.fechaDesde);
+        const fechaHasta = dayjs(reserva.fechaHasta);
+
+        if (hoy.isAfter(fechaDesde) && hoy.isBefore(fechaHasta.add(1, 'day'))) {
+            return res.status(400).json({
+                error: 'La reserva se encuentra actualmente en curso, por lo que no se puede cambiar el conductor.'
+            });
+        }
+
         const licenciaExistente = await driverModel.buscarPorLicencia(licencia);
         if (licenciaExistente) {
             return res.status(400).json({ error: 'La licencia ya está asociada a otro conductor.' });
-        }
-
-        const tieneReserva = await reserveModel.licenciaConReservaActiva(licencia);
-        if (tieneReserva) {
-            return res.status(400).json({ error: 'La licencia ya está asociada a una reserva activa.' });
         }
 
         const viejoId = await reserveModel.obtenerIdConductorPorReserva(idReserva);
@@ -48,13 +60,22 @@ const cancelReserve = async (req, res) => {
         const reserva = await reserveModel.obtenerReservaPorId(idReserva);
         if (!reserva) return res.status(404).json({ error: 'Reserva no encontrada.' });
 
-        if (reserva.estado === 'cancelada') {
-            return res.status(400).json({ error: 'La reserva ya está cancelada.' });
+        if (reserva.estado === 'cancelada' || reserva.estado === 'finalizada') {
+            return res.status(400).json({ error: 'La reserva ya se encuentra finalizada o cancelada.' });
         }
 
-        const hoy = dayjs();
-        const fechaDesde = dayjs(reserva.fechaDesde);
+        const hoy = dayjs().startOf('day'); // Fecha de hoy sin hora
+        const fechaDesde = dayjs(reserva.fechaDesde).startOf('day');
+        const fechaHasta = dayjs(reserva.fechaHasta).startOf('day');
 
+        // Verificamos si la reserva está en curso
+        if (hoy.isAfter(fechaDesde) && hoy.isBefore(fechaHasta.add(1, 'day'))) {
+            return res.status(400).json({
+                error: 'La reserva se encuentra actualmente en curso y no puede ser cancelada.'
+            });
+        }
+
+        // Cancelación con un día de anticipación para cliente
         if (tipoCancelacion === 'cliente' && fechaDesde.diff(hoy, 'day') < 1) {
             return res.status(400).json({ error: 'La cancelación debe hacerse con un día de anticipación.' });
         }
@@ -63,7 +84,11 @@ const cancelReserve = async (req, res) => {
         await reserveModel.marcarReservaComoCancelada(idReserva);
 
         if (numero_tarjeta && monto) {
-            await creditCardModel.reembolsarATarjeta(numero_tarjeta, monto);
+            const tarjeta = await creditCardModel.obtenerTarjetaPorNumero(numero_tarjeta);
+            if (!tarjeta) {
+                return res.status(400).json({ error: 'Número de tarjeta inválido para reembolso.' });
+            }
+            await creditCardModel.reembolsarATarjeta(tarjeta.id_tarjeta, monto);
         }
 
         return res.status(200).json({ mensaje: 'Reserva cancelada correctamente.' });
@@ -151,6 +176,7 @@ const reserveVehicle = async (req, res) => {
 const listReserveOfUser = async (req, res) => {
     const idUsuario = req.usuario.id;
     try {
+        await reserveModel.marcarReservasFinalizadas();
         const reservas = await reserveModel.getReservationsPerUser(idUsuario);
         res.status(200).json(reservas);
     } catch (error) {

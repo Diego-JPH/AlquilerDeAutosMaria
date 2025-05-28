@@ -35,7 +35,7 @@ export default function ChangeDriverForm({ idReserva }) {
             <input
                 type="text"
                 name="nombre"
-                placeholder="Nombre"
+                placeholder="Nombre *"
                 value={form.nombre}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
@@ -43,23 +43,28 @@ export default function ChangeDriverForm({ idReserva }) {
             <input
                 type="text"
                 name="apellido"
-                placeholder="Apellido"
+                placeholder="Apellido *"
                 value={form.apellido}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
             />
-            <input
-                type="date"
-                name="fechaNacimiento"
-                placeholder="Fecha de Nacimiento"
-                value={form.fechaNacimiento}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-            />
+            <div>
+                <label className="block text-sm text-gray-600 mb-1" htmlFor="fechaNacimiento">
+                    Fecha de Nacimiento *
+                </label>
+                <input
+                    type="date"
+                    id="fechaNacimiento"
+                    name="fechaNacimiento"
+                    value={form.fechaNacimiento}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                />
+            </div>
             <input
                 type="text"
                 name="licencia"
-                placeholder="Licencia"
+                placeholder="Licencia *"
                 value={form.licencia}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
