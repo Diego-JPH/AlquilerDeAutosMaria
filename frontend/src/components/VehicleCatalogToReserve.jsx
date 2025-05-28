@@ -20,7 +20,7 @@ export default function VehicleCatalogToReserve() {
   }, []);
 
   const handleReservar = (idVehiculo, idSucursal) => {
-    navigate(`/create-reserve?idVehiculo=${idVehiculo}?idSucursal=${idSucursal}`);
+    navigate(`/create-reserve?idVehiculo=${idVehiculo}&idSucursal=${idSucursal}`);
   };
 
   return (
