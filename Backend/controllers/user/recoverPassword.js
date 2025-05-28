@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const pool = require('../../config/db');
-const sendRecoveryEmail = require('../../utils/mailer');
+const { sendRecoveryEmail } = require('../../utils/mailer');
 
 const recoverPassword = async (req, res) => {
   const { email } = req.body;
@@ -22,7 +22,7 @@ const recoverPassword = async (req, res) => {
 
     const recoveryLink = `http://localhost:5173/reset-password?token=${token}`;
 
-    await sendRecoveryEmail.sendRecoveryEmail(email, recoveryLink);
+    await sendRecoveryEmail(email, recoveryLink);
 
     res.json({ message: 'Correo enviado para recuperar contraseña' });
   } catch (err) {

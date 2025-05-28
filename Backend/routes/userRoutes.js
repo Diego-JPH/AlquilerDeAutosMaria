@@ -8,5 +8,6 @@ router.post('/registrar-cliente', userController.registrarCliente);
 router.post('/login', userController.iniciarSesion);
 router.post('/recoverPassword', recoverPassword.recoverPassword);
 router.put('/resetPassword', resetPassword.resetPassword);
+router.post('/verificar-codigo', userController.verificarCodigo);
 
 module.exports = router;

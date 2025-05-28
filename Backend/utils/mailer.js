@@ -28,4 +28,21 @@ const sendRecoveryEmail = async (to, token) => {
   });
 };
 
-module.exports = { sendRecoveryEmail };
+const sendVerificationEmail = async (to, codigo) => {
+  await transporter.sendMail({
+    from: `"Alquiler de Autos María" <alquileresdeautosmaria@gmail.com>`,
+    to,
+    subject: 'Verificación de inicio de sesión',
+    html: `
+      <p>Hola,</p>
+      <p>Tu código de verificación para iniciar sesión es:</p>
+      <h2>${codigo}</h2>
+      <p>Este código es válido por unos minutos.</p>
+    `,
+  });
+};
+
+module.exports = { 
+  sendRecoveryEmail,
+  sendVerificationEmail 
+};
