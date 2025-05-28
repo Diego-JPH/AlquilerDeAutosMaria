@@ -20,18 +20,18 @@ export default function VerifyCodeForm() {
     console.log('Enviando:', { email, codigoIngresado: parseInt(codigoLimpio, 10) });
 
     try {
-        const res = await axios.post('http://localhost:3000/api/user/verificar-codigo', {
+      const res = await axios.post('http://localhost:3000/api/user/verificar-codigo', {
         email,
         codigoIngresado: parseInt(codigoLimpio, 10)
-        });
+      });
 
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('rol', res.data.rol);
-        navigate('/');
-        window.location.reload();
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('rol', res.data.rol);
+      navigate('/admin');
+      window.location.reload();
     } catch (err) {
-        const msg = err.response?.data?.mensaje || 'Error al verificar código';
-        setError(msg);
+      const msg = err.response?.data?.mensaje || 'Error al verificar código';
+      setError(msg);
     }
   };
 
@@ -60,9 +60,8 @@ export default function VerifyCodeForm() {
         <button
           type="submit"
           disabled={!codigo}
-          className={`${
-            codigo ? 'bg-green-800 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'
-          } text-white font-bold py-3 px-6 rounded-md text-lg transition`}
+          className={`${codigo ? 'bg-green-800 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'
+            } text-white font-bold py-3 px-6 rounded-md text-lg transition`}
         >
           Verificar código
         </button>

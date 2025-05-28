@@ -23,13 +23,7 @@ export default function LoginForm() {
       } else {
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('rol', res.data.usuario.rol);
-
-        if (res.data.usuario.rol === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/cliente');
-        }
-        //window.location.reload();
+        navigate('/cliente');
       }
     } catch (err) {
       const msg = err.response?.data?.mensaje || 'Error al iniciar sesión';
