@@ -103,8 +103,6 @@ export default function UpdateVehicleForm() {
             placeholder="Ej: 100, 50, 0"
             value={politicaDevolucion}
             onChange={(e) => setPoliticaDevolucion(e.target.value)}
-            min="0"
-            max="100"
             className="w-full p-2 rounded text-black"
           />
         </div>
