@@ -1,18 +1,37 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 export default function FormularioReserva() {
-  const idUsuario = 1; // <- Hardcodeado
-  const idVehiculo = 1; // <- Hardcodeado
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // 👉 Obtenemos params de la URL
+  const queryParams = new URLSearchParams(location.search);
+  const idVehiculo = queryParams.get("idVehiculo");
+  const sucursalRetiro = queryParams.get("idSucursal");
+
+  // 👉 Obtenemos token y decodificamos para sacar idUsuario
+  const token = localStorage.getItem("token");
+  let idUsuario = null;
+  if (token) {
+    try {
+      const datos = jwtDecode(token);
+      idUsuario = datos.id;
+    } catch (error) {
+      console.error("Error al decodificar el token:", error);
+    }
+  }
+
   const [formData, setFormData] = useState({
     fecha_inicio: "",
     fecha_fin: "",
-    sucursal_retiro_id: "",
     sucursal_entrega_id: "",
     nombre: "",
     apellido: "",
     fechaN: "",
-    licencia: ""
+    licencia: "",
   });
 
   const [sucursales, setSucursales] = useState([]);
@@ -20,7 +39,7 @@ export default function FormularioReserva() {
   useEffect(() => {
     const getSucursales = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/sucursales/getSucursales"); 
+        const response = await axios.get("http://localhost:3000/api/sucursales/getSucursales");
         setSucursales(response.data);
       } catch (error) {
         console.error("Error al obtener las sucursales:", error);
@@ -37,25 +56,40 @@ export default function FormularioReserva() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!token) {
+      alert("Debe iniciar sesión para realizar una reserva.");
+      return;
+    }
+
     const data = {
       id_vehiculo: idVehiculo,
       id_usuario: idUsuario,
       fechaDesde: formData.fecha_inicio,
       fechaHasta: formData.fecha_fin,
-      sucursal_retiro_id: parseInt(formData.sucursal_retiro_id),
+      sucursal_retiro_id: parseInt(sucursalRetiro),
       sucursal_entrega_id: parseInt(formData.sucursal_entrega_id),
       nombre: formData.nombre,
       apellido: formData.apellido,
       fechaN: formData.fechaN,
       licencia: formData.licencia,
     };
-    
+
     try {
-      const response = await axios.post("/api/reserve/create-reserve", data);
+      const response = await axios.post(
+        "http://localhost:3000/api/reserve/create-reserve",
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // 📌 mandamos el token acá
+          },
+        }
+      );
       alert("Reserva realizada con éxito");
+      navigate("/reserve"); // opcional: redirigir después de reservar
     } catch (error) {
       console.error("Error al realizar la reserva:", error);
-      alert("Error al realizar la reserva");
+      const mensaje = error.response?.data?.error || "Error al realizar la reserva";
+      alert(mensaje);
     }
   };
 
@@ -85,24 +119,6 @@ export default function FormularioReserva() {
           className="w-full border rounded px-3 py-2"
           required
         />
-      </div>
-
-      <div className="mb-4">
-        <label htmlFor="sucursal_retiro_id" className="block text-gray-700 mb-2">Sucursal de retiro *</label>
-        <select
-          name="sucursal_retiro_id"
-          value={formData.sucursal_retiro_id}
-          onChange={handleChange}
-          className="w-full border rounded px-3 py-2"
-          required
-        >
-          <option value="">Seleccione una sucursal</option>
-          {sucursales.map((sucursal) => (
-            <option key={sucursal.id_sucursal} value={sucursal.id_sucursal}>
-              {sucursal.sucursal}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div className="mb-4">

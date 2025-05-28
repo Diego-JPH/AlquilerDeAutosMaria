@@ -31,7 +31,6 @@ export default function AppRouter({ isLoggedIn, onLogout }) {
           <Route path="/recoverPassword" element={<RecoverPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verificarCodigo" element={<VerifyCodePage />} />
-
           {/* Cliente */}
           <Route path="/create-reserve" element={<CreateReserve />} />
           <Route path="/reserve" element={<ReservePage />} />

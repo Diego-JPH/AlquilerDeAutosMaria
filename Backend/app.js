@@ -13,6 +13,7 @@ const creditCardRoutes = require('./routes/creditCardRoutes');
 // Configuración básica
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
+app.use('/uploads', express.static('public/uploads'));
 
 // Rutas de la API
 app.use('/api/reserve', reserveRoutes);
