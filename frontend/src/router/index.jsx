@@ -12,11 +12,9 @@ import Home from "../pages/Home"; // Vista central que redirige a cliente/admin 
 // Cliente
 import CreateReserve from "../pages/CreateReserve";
 import ReservePage from "../pages/ReservePage";
-import ClientHomePage from "../pages/ClientHomePage";
 
 // Admin
 import ManageVehicles from "../pages/ManageVehicles";
-import AdminHomePage from "../pages/AdminHomePage";
 
 export default function AppRouter({ isLoggedIn, onLogout }) {
   return (
@@ -31,16 +29,13 @@ export default function AppRouter({ isLoggedIn, onLogout }) {
           <Route path="/recoverPassword" element={<RecoverPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verificarCodigo" element={<VerifyCodePage />} />
+
           {/* Cliente */}
           <Route path="/create-reserve" element={<CreateReserve />} />
           <Route path="/reserve" element={<ReservePage />} />
-          <Route path="/cliente" element={<ClientHomePage />} />
 
           {/* Admin */}
           <Route path="/manageVehicles" element={<ManageVehicles />} />
-          <Route path="/admin" element={<AdminHomePage />} />
-
-
         </Routes>
       </MainLayout>
     </Router>

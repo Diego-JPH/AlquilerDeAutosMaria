@@ -22,8 +22,9 @@ export default function LoginForm() {
         navigate('/verificarCodigo');
       } else {
         localStorage.setItem('token', res.data.token);
-        localStorage.setItem('rol', res.data.usuario.rol);
-        navigate('/cliente');
+        localStorage.setItem('rol', res.data.rol);
+        navigate('/');
+        window.location.reload();
       }
     } catch (err) {
       const msg = err.response?.data?.mensaje || 'Error al iniciar sesión';
