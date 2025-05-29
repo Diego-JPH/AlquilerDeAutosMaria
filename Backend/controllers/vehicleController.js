@@ -2,6 +2,7 @@ const db = require('../config/db');
 const fs = require('fs');
 const path = require('path');
 const { saveImage } = require('../models/saveImage'); // Ajustá el path si está en otra carpeta
+const { getVehiclesAvailableBetweenDates } = require("../models/vehicleModels");
 
 
 const updateVehicle = async (req, res) => {
@@ -225,9 +226,27 @@ const getVehicles = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener los vehiculos' });
   }
 };
+
+const getAvailableVehiclesByDate = async (req, res) => {
+  const { fechaDesde, fechaHasta } = req.query;
+
+  if (!fechaDesde || !fechaHasta) {
+    return res.status(400).json({ error: "Fechas requeridas" });
+  }
+
+  try {
+    const vehicles = await getVehiclesAvailableBetweenDates(fechaDesde, fechaHasta);
+    res.status(200).json(vehicles);
+  } catch (error) {
+    console.error("Error al obtener vehículos disponibles:", error);
+    res.status(500).json({ error: "Error del servidor" });
+  }
+};
+
 module.exports = {
   updateVehicle,
   insertVehicle,
   deleteVehicle,
   getVehicles,
+  getAvailableVehiclesByDate,
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -12,11 +12,12 @@ export default function InsertVehicleForm() {
     ultimoMantenimiento: '',
     categoria: '',
     sucursal: '',
-    politicaDevolucion: '', // 👈 nuevo campo
+    politicaDevolucion: '',
   });
 
-  const [imagen, setImagen] = useState(null); // Imagen seleccionada
+  const [imagen, setImagen] = useState(null);
   const [sucursales, setSucursales] = useState([]);
+  const fileInputRef = useRef(null); // Referencia al input file
 
   useEffect(() => {
     const fetchSucursales = async () => {
@@ -50,6 +51,11 @@ export default function InsertVehicleForm() {
       return;
     }
 
+    if (form.politicaDevolucion < 0 || form.politicaDevolucion > 100) {
+      toast.warn('La política de devolución debe ser entre 0 y 100');
+      return;
+    }
+
     const formData = new FormData();
     for (const key in form) {
       formData.append(key, form[key]);
@@ -57,11 +63,6 @@ export default function InsertVehicleForm() {
 
     if (imagen) {
       formData.append('imagen', imagen);
-    }
-    
-    if (form.politicaDevolucion < 0 || form.politicaDevolucion > 100) {
-      toast.warn('La política de devolución debe ser entre 0 y 100');
-      return;
     }
 
     try {
@@ -88,9 +89,13 @@ export default function InsertVehicleForm() {
         ultimoMantenimiento: '',
         categoria: '',
         sucursal: '',
-        politicaDevolucion: '', // 👈 limpiar campo también
+        politicaDevolucion: '',
       });
+
       setImagen(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = null; // Limpiar input de imagen
+      }
     } catch (err) {
       console.error(err);
       toast.error('Error al agregar vehículo');
@@ -100,7 +105,7 @@ export default function InsertVehicleForm() {
   return (
     <div className="bg-green-900 text-white p-6 rounded shadow">
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       <h2 className="text-xl font-bold mb-4">Agregar Vehículo</h2>
 
       <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit} encType="multipart/form-data">
@@ -168,7 +173,13 @@ export default function InsertVehicleForm() {
 
         <div className="md:col-span-2">
           <label className="block text-sm mb-1">Imagen del vehículo (opcional)</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} className="p-2 rounded text-white w-full" />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            ref={fileInputRef}
+            className="p-2 rounded text-white w-full"
+          />
         </div>
 
         <div className="md:col-span-2">

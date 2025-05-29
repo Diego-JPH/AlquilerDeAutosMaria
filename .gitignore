@@ -32,3 +32,4 @@ coverage/
 *.postman_environment.json
 
 docker-compose.yml
+/Backend/public
