@@ -28,8 +28,7 @@ export default function RegisterForm() {
     // Validación de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setError(true);
-      setErrorMsg('El formato del correo electrónico no es válido');
+      toast.error('El formato del correo electrónico no es válido');
       return;
     }
 

@@ -1,40 +1,39 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function VerifyCodeForm() {
   const [codigo, setCodigo] = useState('');
-  const [error, setError] = useState('');
-  const [mensaje, setMensaje] = useState('');
   const navigate = useNavigate();
-
-  const email = localStorage.getItem('emailPendienteVerificacion');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
     const email = localStorage.getItem('emailPendienteVerificacion');
     const codigoLimpio = codigo.toString().trim();
 
-    console.log('Enviando:', { email, codigoIngresado: parseInt(codigoLimpio, 10) });
-
     try {
-        const res = await axios.post('http://localhost:3000/api/user/verificar-codigo', {
+      const res = await axios.post('http://localhost:3000/api/user/verificar-codigo', {
         email,
-        codigoIngresado: parseInt(codigoLimpio, 10)
-        });
+        codigoIngresado: parseInt(codigoLimpio, 10),
+      });
 
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('rol', res.data.rol);
+      toast.success('Código verificado con éxito');
+
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('rol', res.data.rol);
+
+      setTimeout(() => {
         navigate('/');
         window.location.reload();
+      }, 1000); // Pequeña pausa para mostrar el toast antes de redirigir
     } catch (err) {
-        const msg = err.response?.data?.mensaje || 'Error al verificar código';
-        setError(msg);
+      const msg = err.response?.data?.mensaje || 'Error al verificar código';
+      toast.error(msg);
     }
   };
-
 
   return (
     <div className="bg-white text-gray-800 w-full max-w-xl mx-auto mt-16 p-10 rounded-2xl shadow-lg">
@@ -66,10 +65,21 @@ export default function VerifyCodeForm() {
         >
           Verificar código
         </button>
-
-        {error && <p className="text-red-500 text-center">{error}</p>}
-        {mensaje && <p className="text-green-700 text-center">{mensaje}</p>}
       </form>
+
+      {/* Contenedor de notificaciones toast */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 }

@@ -14,6 +14,7 @@ export default function App() {
     localStorage.removeItem('token');
     localStorage.removeItem('rol');
     setIsLoggedIn(false);
+    window.location.href = '/';
   };
 
   return <AppRouter isLoggedIn={isLoggedIn} onLogout={handleLogout} />;
