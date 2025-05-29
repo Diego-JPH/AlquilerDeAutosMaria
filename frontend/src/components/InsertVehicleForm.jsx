@@ -168,7 +168,7 @@ export default function InsertVehicleForm() {
 
         <div className="md:col-span-2">
           <label className="block text-sm mb-1">Imagen del vehículo (opcional)</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} className="p-2 rounded text-black w-full" />
+          <input type="file" accept="image/*" onChange={handleImageChange} className="p-2 rounded text-white w-full" />
         </div>
 
         <div className="md:col-span-2">
