@@ -103,6 +103,7 @@ const reserveVehicle = async (req, res) => {
         fechaN,
         licencia,
         id_usuario,
+        monto,
     } = req.body;
 
     try {
@@ -155,6 +156,7 @@ const reserveVehicle = async (req, res) => {
             id_sucursal_entrega: sucursal_entrega_id,
             id_vehiculo,
             estado: 'activa',
+            monto,
         });
 
         return res.status(201).json({ message: 'Reserva realizada con éxito.', reservaId });

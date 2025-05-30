@@ -5,13 +5,16 @@ import { jwtDecode } from "jwt-decode";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-export default function FormularioReserva() {
+export default function CreateReserveForm() {
   const location = useLocation();
   const navigate = useNavigate();
 
   const queryParams = new URLSearchParams(location.search);
   const idVehiculo = queryParams.get("idVehiculo");
   const sucursalRetiro = queryParams.get("idSucursal");
+  const precioPorDia = parseFloat(queryParams.get("precioPorDia"));
+  const fechaDesde = queryParams.get("fechaDesde");
+  const fechaHasta = queryParams.get("fechaHasta");
 
   const token = localStorage.getItem("token");
   let idUsuario = null;
@@ -25,8 +28,8 @@ export default function FormularioReserva() {
   }
 
   const [formData, setFormData] = useState({
-    fecha_inicio: "",
-    fecha_fin: "",
+    fecha_inicio: fechaDesde || "",
+    fecha_fin: fechaHasta || "",
     sucursal_entrega_id: "",
     nombre: "",
     apellido: "",
@@ -53,11 +56,53 @@ export default function FormularioReserva() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const calcularEdad = (fechaNacimiento) => {
+    if (!fechaNacimiento) return 0;
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+    return edad;
+  };
+
+  const calcularMonto = (desde, hasta, precioPorDia) => {
+    const inicio = new Date(desde);
+    const fin = new Date(hasta);
+    const diferenciaMs = fin - inicio;
+
+    if (isNaN(inicio) || isNaN(fin) || diferenciaMs <= 0) return 0;
+
+    const dias = Math.ceil(diferenciaMs / (1000 * 60 * 60 * 24));
+    return dias * precioPorDia;
+  };
+
+  const edadConductor = calcularEdad(formData.fechaN);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!token) {
       toast.error("Debe iniciar sesión para realizar una reserva.");
+      return;
+    }
+
+    if (new Date(formData.fecha_inicio) >= new Date(formData.fecha_fin)) {
+      toast.error("La fecha de inicio debe ser anterior a la fecha de fin.");
+      return;
+    }
+
+    if (edadConductor < 18) {
+      toast.error("El conductor debe ser mayor de edad (18 años o más).");
+      return;
+    }
+
+    const monto = calcularMonto(formData.fecha_inicio, formData.fecha_fin, precioPorDia);
+
+    if (!monto || isNaN(monto) || monto <= 0) {
+      toast.error("El monto calculado es inválido.");
       return;
     }
 
@@ -72,6 +117,7 @@ export default function FormularioReserva() {
       apellido: formData.apellido,
       fechaN: formData.fechaN,
       licencia: formData.licencia,
+      monto: monto,
     };
 
     try {
@@ -85,9 +131,11 @@ export default function FormularioReserva() {
         }
       );
       toast.success("Reserva realizada con éxito");
-      navigate("/reserve");
+      setTimeout(() => {
+        navigate("/reserve");
+      }, 2000);
     } catch (error) {
-      console.error("Error al realizar la reserva:", error);
+      console.error("Error al realizar la reserva:", error.response);
       const mensaje = error.response?.data?.error || "Error al realizar la reserva";
       toast.error(mensaje);
     }
@@ -95,12 +143,16 @@ export default function FormularioReserva() {
 
   return (
     <>
-      <ToastContainer />
-      <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md"
+      >
         <h2 className="text-xl font-semibold mb-4">Reservar Vehículo</h2>
 
         <div className="mb-4">
-          <label htmlFor="fecha_inicio" className="block text-gray-700 mb-2">Fecha de inicio *</label>
+          <label htmlFor="fecha_inicio" className="block text-gray-700 mb-2">
+            Fecha de inicio *
+          </label>
           <input
             type="date"
             name="fecha_inicio"
@@ -112,7 +164,9 @@ export default function FormularioReserva() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="fecha_fin" className="block text-gray-700 mb-2">Fecha de fin *</label>
+          <label htmlFor="fecha_fin" className="block text-gray-700 mb-2">
+            Fecha de fin *
+          </label>
           <input
             type="date"
             name="fecha_fin"
@@ -124,7 +178,9 @@ export default function FormularioReserva() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="sucursal_entrega_id" className="block text-gray-700 mb-2">Sucursal de entrega *</label>
+          <label htmlFor="sucursal_entrega_id" className="block text-gray-700 mb-2">
+            Sucursal de entrega *
+          </label>
           <select
             name="sucursal_entrega_id"
             value={formData.sucursal_entrega_id}
@@ -191,10 +247,15 @@ export default function FormularioReserva() {
 
         <p className="text-sm text-gray-500 italic mb-4">* Campos obligatorios</p>
 
-        <button type="submit" className="w-full bg-green-800 text-white rounded py-2 hover:bg-green-700">
+        <button
+          type="submit"
+          className="w-full bg-green-800 text-white rounded py-2 hover:bg-green-700"
+        >
           Reservar
         </button>
       </form>
+
+      <ToastContainer />
     </>
   );
 }

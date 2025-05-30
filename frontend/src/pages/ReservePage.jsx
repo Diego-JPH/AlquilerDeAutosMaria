@@ -38,7 +38,6 @@ export default function ReservePage() {
     const abrirCancelModal = async (reserva) => {
         const token = localStorage.getItem("token");
         setSelectedReserva(reserva);
-        setShowCancelModal(true);
         setCancelForm({ motivo: "", numero_tarjeta: "" });
 
         try {
@@ -47,11 +46,22 @@ export default function ReservePage() {
                     Authorization: `Bearer ${token}`
                 }
             });
+
             if (!res.ok) {
                 throw new Error(`Error HTTP: ${res.status}`);
             }
+
             const data = await res.json();
+
+            if (data.length === 0) {
+                setMensaje("❌ No se encontraron tarjetas de crédito.");
+                setTimeout(() => setMensaje(""), 4000);
+                return; // No continuar ni abrir modal
+            }
+
             setTarjetas(data);
+            setShowCancelModal(true);
+
         } catch (err) {
             console.error("Error al obtener tarjetas:", err);
             setMensaje("❌ " + extraerMensajeError(err, "Error al obtener tarjetas"));
