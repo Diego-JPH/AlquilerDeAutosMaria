@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 const obtenerTarjetas = async () => {
     const [tarjetas] = await db.query('SELECT id_tarjeta, numero_tarjeta, titular, saldo FROM TarjetaCredito');
-    return tarjetas;
+    return tarjetas || null;
 };
 
 async function reembolsarATarjeta(idTarjeta, monto) {
