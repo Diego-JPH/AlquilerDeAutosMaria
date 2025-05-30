@@ -110,7 +110,7 @@ const reserveVehicle = async (req, res) => {
         const fechaEntrega = new Date(fechaHasta);
 
         if (fechaRetiro >= fechaEntrega) {
-            return res.status(400).json({ error: 'Las fechas ingresadas son inválidas.' });
+            return res.status(400).json({ error: 'La fecha de inicio debe ser anterior a la fecha de fin.' });
         }
 
         const reservasExistentes = await reserveModel.verificarDisponibilidadVehiculo(id_vehiculo, fechaDesde, fechaHasta);
@@ -135,7 +135,7 @@ const reserveVehicle = async (req, res) => {
 
             const edad = dayjs().diff(dayjs(fechaN), 'year');
             if (edad < 18) {
-                return res.status(400).json({ error: 'El conductor debe ser mayor de edad.' });
+                return res.status(400).json({ error: 'El conductor debe ser mayor de edad (18 años o más).' });
             }
 
             conductorId = await reserveModel.crearConductor(licencia, nombre, apellido, fechaN);

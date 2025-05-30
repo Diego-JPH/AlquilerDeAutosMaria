@@ -1,29 +1,27 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function RecuperarContraseniaForm() {
   const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [mensaje, setMensaje] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // Simulando envío al backend
       await axios.post('http://localhost:3000/api/user/recoverPassword', { email });
-      setMensaje('Te hemos enviado un email para restablecer la contraseña.');
-      setError('');
+      toast.success('Te hemos enviado un email para restablecer la contraseña.');
       setEmail('');
     } catch (err) {
       const msg = err.response?.data?.mensaje || 'Correo no registrado';
-      setError(msg);
-      setMensaje('');
+      toast.error(msg);
     }
   };
 
   return (
     <div className="bg-white text-gray-800 w-full max-w-xl mx-auto mt-16 p-10 rounded-2xl shadow-lg">
+      <ToastContainer />
       <h2 className="text-3xl font-bold text-center mb-8 text-green-800">Recuperar Contraseña</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -52,9 +50,6 @@ export default function RecuperarContraseniaForm() {
         >
           Enviar correo
         </button>
-
-        {error && <p className="text-red-500 text-center">{error}</p>}
-        {mensaje && <p className="text-green-700 text-center">{mensaje}</p>}
       </form>
     </div>
   );

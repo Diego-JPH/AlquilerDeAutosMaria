@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function ResetPasswordForm() {
   const [searchParams] = useSearchParams();
   const [newPassword, setNewPassword] = useState('');
-  const [error, setError] = useState('');
-  const [mensaje, setMensaje] = useState('');
-  const navigate = useNavigate();
-
   const token = searchParams.get('token');
 
   useEffect(() => {
     if (!token) {
-      setError('Token inválido o faltante.');
+      toast.error('Token inválido o faltante.');
       console.log('Token desde URL:', token);
     }
   }, [token]);
@@ -22,7 +20,7 @@ export default function ResetPasswordForm() {
     e.preventDefault();
 
     if (!token) {
-      setError('Token inválido.');
+      toast.error('Token inválido.');
       return;
     }
 
@@ -32,25 +30,22 @@ export default function ResetPasswordForm() {
         newPassword,
       });
 
-      setMensaje('Contraseña actualizada correctamente.');
-      setError('');
+      toast.success('Contraseña actualizada correctamente.');
       setNewPassword('');
 
       setTimeout(() => {
         window.location.href = 'http://localhost:5173/login';
-      }, 3000); // redirige al login en 3 segundos
+      }, 3000);
     } catch (err) {
       const msg = err.response?.data?.message || 'Error al actualizar contraseña';
-      setError(msg);
-      setMensaje('');
+      toast.error(msg);
     }
   };
 
   return (
     <div className="bg-white text-gray-800 w-full max-w-xl mx-auto mt-16 p-10 rounded-2xl shadow-lg">
+      <ToastContainer />
       <h2 className="text-3xl font-bold text-center mb-8 text-green-800">Restablecer Contraseña</h2>
-
-      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div>
@@ -78,8 +73,6 @@ export default function ResetPasswordForm() {
         >
           Guardar Contraseña
         </button>
-
-        {mensaje && <p className="text-green-700 text-center">{mensaje}</p>}
       </form>
     </div>
   );

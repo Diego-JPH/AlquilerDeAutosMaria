@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function VehicleCatalogToReserve() {
   const [vehiculos, setVehiculos] = useState([]);
@@ -14,6 +16,7 @@ export default function VehicleCatalogToReserve() {
       setVehiculos(response.data);
     } catch (error) {
       console.error("Error al obtener los vehículos:", error);
+      toast.error("Error al obtener los vehículos");
     }
   };
 
@@ -27,7 +30,12 @@ export default function VehicleCatalogToReserve() {
 
   const handleFiltrar = async () => {
     if (!fechaDesde || !fechaHasta) {
-      alert("Seleccioná ambas fechas");
+      toast.error("Seleccioná ambas fechas");
+      return;
+    }
+
+    if (new Date(fechaDesde) >= new Date(fechaHasta)) {
+      toast.error("Formato de fechas incorrectas");
       return;
     }
 
@@ -35,20 +43,27 @@ export default function VehicleCatalogToReserve() {
       const response = await axios.get("http://localhost:3000/api/vehicles/getVehiclesAvailableByDate", {
         params: { fechaDesde, fechaHasta },
       });
+
+      if (response.data.length === 0) {
+        toast.info("No se encontraron vehiculos disponibles para ese rango de fechas");
+      }
+
       setVehiculos(response.data);
     } catch (error) {
       console.error("Error al filtrar vehículos:", error);
+      toast.error("Error al filtrar vehículos");
     }
   };
 
   const handleLimpiarFiltro = () => {
     setFechaDesde("");
     setFechaHasta("");
-    getVehiculos(); // Recarga todos los vehículos
+    getVehiculos();
   };
 
   return (
     <div className="p-8">
+      <ToastContainer />
       {/* Formulario de fechas */}
       <div className="mb-6 flex flex-col md:flex-row gap-4 items-start md:items-center">
         <div className="flex flex-col">
