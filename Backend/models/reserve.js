@@ -113,7 +113,7 @@ async function registrarCancelacion(idReserva, motivo, tipo_cancelacion) {
 
 const verificarDisponibilidadVehiculo = async (idVehiculo, fechaDesde, fechaHasta) => {
     const [result] = await db.execute(
-        'SELECT * FROM Reserva WHERE id_vehiculo = ? AND NOT (fechaHasta < ? OR fechaDesde > ?)',
+        'SELECT * FROM Reserva WHERE id_vehiculo = ? AND NOT (fechaHasta < ? OR fechaDesde > ?) AND estado = "activa"',
         [idVehiculo, fechaDesde, fechaHasta]
     );
     return result;
@@ -155,13 +155,14 @@ const crearReserva = async ({
     id_sucursal_retiro,
     id_sucursal_entrega,
     id_vehiculo,
-    estado
+    estado,
+    monto
 }) => {
     const [result] = await db.execute(
         `INSERT INTO Reserva 
-        (fechaDesde, fechaHasta, id_usuario, id_conductor, id_sucursal_retiro, id_sucursal_entrega, id_vehiculo, estado) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [fechaDesde, fechaHasta, id_usuario, id_conductor, id_sucursal_retiro, id_sucursal_entrega, id_vehiculo, estado]
+        (fechaDesde, fechaHasta, id_usuario, id_conductor, id_sucursal_retiro, id_sucursal_entrega, id_vehiculo, estado, monto) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [fechaDesde, fechaHasta, id_usuario, id_conductor, id_sucursal_retiro, id_sucursal_entrega, id_vehiculo, estado, monto]
     );
     return result.insertId;
 };

@@ -21,8 +21,8 @@ export default function VehicleCatalogToReserve() {
     getVehiculos();
   }, []);
 
-  const handleReservar = (idVehiculo, idSucursal) => {
-    navigate(`/create-reserve?idVehiculo=${idVehiculo}&idSucursal=${idSucursal}`);
+  const handleReservar = (idVehiculo, idSucursal, precioPorDia) => {
+    navigate(`/create-reserve?idVehiculo=${idVehiculo}&idSucursal=${idSucursal}&fechaDesde=${fechaDesde}&fechaHasta=${fechaHasta}&precioPorDia=${precioPorDia}`);
   };
 
   const handleFiltrar = async () => {
@@ -115,7 +115,7 @@ export default function VehicleCatalogToReserve() {
               <p className="text-gray-700 mb-4">Precio por día: ${vehiculo.precioPorDia}</p>
 
               <button
-                onClick={() => handleReservar(vehiculo.id_vehiculo, vehiculo.id_sucursal)}
+                onClick={() => handleReservar(vehiculo.id_vehiculo, vehiculo.id_sucursal, vehiculo.precioPorDia)}
                 className="w-full bg-green-800 text-white py-2 rounded hover:bg-green-700"
               >
                 Reservar
