@@ -130,10 +130,13 @@ export default function CreateReserveForm() {
           },
         }
       );
+      
       toast.success("Reserva realizada con éxito");
+      // Redirigir a la página de pago con los datos necesarios por query
       setTimeout(() => {
-        navigate("/reserve");
+        navigate(`/payment?reservaId=${response.data.reservaId}&monto=${monto}`);
       }, 2000);
+
     } catch (error) {
       console.error("Error al realizar la reserva:", error.response);
       const mensaje = error.response?.data?.error || "Error al realizar la reserva";

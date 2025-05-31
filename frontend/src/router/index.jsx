@@ -12,6 +12,7 @@ import Home from "../pages/Home"; // Vista central que redirige a cliente/admin 
 // Cliente
 import CreateReserve from "../pages/CreateReserve";
 import ReservePage from "../pages/ReservePage";
+import PaymentPage from "../pages/PaymentPage";
 
 // Admin
 import ManageVehicles from "../pages/ManageVehicles";
@@ -34,6 +35,7 @@ export default function AppRouter({ isLoggedIn, onLogout }) {
           {/* Cliente */}
           <Route path="/create-reserve" element={<CreateReserve />} />
           <Route path="/reserve" element={<ReservePage />} />
+          <Route path="/payment" element={<PaymentPage />} />
 
           {/* Admin */}
           <Route path="/manageVehicles" element={<ManageVehicles />} />

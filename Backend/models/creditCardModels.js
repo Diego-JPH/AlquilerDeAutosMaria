@@ -28,8 +28,33 @@ const obtenerTarjetaPorNumero = async (numero_tarjeta) => {
     return rows[0];  // tarjeta o undefined
 };
 
+const obtenerTarjetaPorDatos = async (numero, vencimiento, cvv, titular) => {
+  const [result] = await db.query(
+    `SELECT * FROM TarjetaCredito 
+     WHERE numero_tarjeta = ? AND fecha_vencimiento = ? AND cvv = ? AND titular = ?`,
+    [numero, vencimiento, cvv, titular]
+  );
+  return result[0] || null;
+};
+
+const cobrarATarjeta = async (idTarjeta, monto) => {
+  await db.query(
+    `UPDATE TarjetaCredito SET saldo = saldo - ? WHERE id_tarjeta = ?`,
+    [monto, idTarjeta]
+  );
+};
+
 module.exports = {
     reembolsarATarjeta,
     obtenerTarjetas,
-    obtenerTarjetaPorNumero
+    obtenerTarjetaPorNumero,
+    obtenerTarjetaPorDatos,
+    cobrarATarjeta,
+    obtenerTarjetaPorNumero: async (numero) => {
+        const [result] = await db.query(`SELECT * FROM TarjetaCredito WHERE numero_tarjeta = ?`, [numero]);
+        return result[0] || null;
+    },
+    reembolsarATarjeta: async (idTarjeta, monto) => {
+        await db.query(`UPDATE TarjetaCredito SET saldo = saldo + ? WHERE id_tarjeta = ?`, [monto, idTarjeta]);
+    }
 };
