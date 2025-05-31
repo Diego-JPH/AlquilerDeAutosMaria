@@ -47,8 +47,12 @@ export default function Header({ isLoggedIn, onLogout }) {
 
             {/* Mostrar botón "Administrar vehículos" solo si el rol es admin */}
             {rol === 'admin' && (
-              <Link to="/manageVehicles" className="hover:underline">Administrar vehículos</Link>
+              <>
+                <Link to="/adminReserve" className="hover:underline">Lista de reservas</Link>
+                <Link to="/manageVehicles" className="hover:underline">Administrar vehículos</Link>
+              </>
             )}
+
 
             <button onClick={onLogout} className="hover:underline">Cerrar sesión</button>
           </>
