@@ -2,6 +2,7 @@ const dayjs = require('dayjs');
 const driverModel = require('../models/driver');
 const reserveModel = require('../models/reserve');
 const creditCardModel = require('../models/creditCardModels');
+const db = require('../config/db');
 
 const changeDriver = async (req, res) => {
     const { nombre, apellido, fechaNacimiento, licencia, idReserva } = req.body;
@@ -179,9 +180,40 @@ const listReserveOfUser = async (req, res) => {
     }
 };
 
+const getAllReservations = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        r.id_reserva,
+        r.fechaDesde,
+        r.fechaHasta,
+        r.estado,
+        r.monto,
+        u.nombre AS nombre_usuario,
+        u.apellido AS apellido_usuario,
+        v.patente,
+        m.modelo,
+        ma.marca
+      FROM Reserva r
+      LEFT JOIN Usuario u ON r.id_usuario = u.id_usuario
+      LEFT JOIN Vehiculo v ON r.id_vehiculo = v.id_vehiculo
+      LEFT JOIN Modelo m ON v.id_modelo = m.id_modelo
+      LEFT JOIN Marca ma ON m.id_marca = ma.id_marca
+      ORDER BY r.fechaDesde DESC
+    `);
+
+    //console.log("🔎 Reservas encontradas:", rows);
+    res.json(rows);
+  } catch (error) {
+    console.error("❌ Error al obtener las reservas:", error);
+    res.status(500).json({ error: "Error al obtener las reservas" });
+  }
+};
+
 module.exports = {
     changeDriver,
     cancelReserve,
     reserveVehicle,
-    listReserveOfUser
+    listReserveOfUser,
+    getAllReservations
 };

@@ -7,6 +7,7 @@ router.post('/cancel-reserve', verifyToken, reserveController.cancelReserve); //
 router.put('/change-driver', verifyToken, reserveController.changeDriver); //ruta para cambiar el conductor de una reserva
 router.post('/create-reserve', verifyToken, reserveController.reserveVehicle);
 router.get("/my-reservations", verifyToken, reserveController.listReserveOfUser);
+router.get('/all', reserveController.getAllReservations);
 console.log('Cargando rutas de reservas...');
 
 module.exports = router; //exporta el router para usarlo en otros archivos (app.js)

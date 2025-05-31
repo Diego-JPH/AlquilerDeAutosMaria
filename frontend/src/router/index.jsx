@@ -15,6 +15,7 @@ import ReservePage from "../pages/ReservePage";
 
 // Admin
 import ManageVehicles from "../pages/ManageVehicles";
+import ReservationsAdminPage from "../pages/ReservationAdminPage";
 
 export default function AppRouter({ isLoggedIn, onLogout }) {
   return (
@@ -36,6 +37,7 @@ export default function AppRouter({ isLoggedIn, onLogout }) {
 
           {/* Admin */}
           <Route path="/manageVehicles" element={<ManageVehicles />} />
+          <Route path="/adminReserve" element={<ReservationsAdminPage />} />
         </Routes>
       </MainLayout>
     </Router>
