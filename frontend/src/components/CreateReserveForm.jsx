@@ -247,6 +247,13 @@ export default function CreateReserveForm() {
 
         <p className="text-sm text-gray-500 italic mb-4">* Campos obligatorios</p>
 
+        {/* ✅ Monto estimado antes del botón */}
+        {formData.fecha_inicio && formData.fecha_fin && calcularMonto(formData.fecha_inicio, formData.fecha_fin, precioPorDia) > 0 && (
+          <div className="mb-4 text-right text-green-700 font-medium">
+            Monto estimado: ${calcularMonto(formData.fecha_inicio, formData.fecha_fin, precioPorDia).toFixed(2)}
+          </div>
+        )}
+
         <button
           type="submit"
           className="w-full bg-green-800 text-white rounded py-2 hover:bg-green-700"
