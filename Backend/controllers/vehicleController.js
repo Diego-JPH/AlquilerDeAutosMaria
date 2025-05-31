@@ -234,12 +234,21 @@ const getVehicles = async (req, res) => {
 
 const getVehiclesAdmin = async (req, res) => {
   try {
-    const [rows] = await db.query(`
+    const { estado } = req.query;
+    let query = `
       SELECT v.*, m.modelo AS modelo, ma.marca AS marca 
       FROM Vehiculo v 
       JOIN Modelo m ON v.id_modelo = m.id_modelo 
       JOIN Marca ma ON m.id_marca = ma.id_marca
-    `); // No filtramos inactivos aquí
+    `;
+    
+    const params = [];
+    if (estado) {
+      query += ` WHERE v.estado = ?`;
+      params.push(estado);
+    }
+
+    const [rows] = await db.query(query, params);
     res.status(200).json(rows);
   } catch (error) {
     console.error('Error al obtener los vehículos (admin):', error);
