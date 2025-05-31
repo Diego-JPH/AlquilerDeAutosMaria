@@ -193,7 +193,6 @@ const deleteVehicle = async (req, res) => {
 
     const vehiculoId = vehiculoRows[0].id_vehiculo;
 
-    // Verificar si el vehículo está en una reserva activa
     const [reservas] = await db.query(
       `SELECT * FROM Reserva WHERE id_vehiculo = ? AND estado = 'activa'`,
       [vehiculoId]
@@ -203,8 +202,8 @@ const deleteVehicle = async (req, res) => {
       return res.status(400).json({ error: 'El auto se encuentra en una reserva activa' });
     }
 
-    // Eliminar el vehículo
-    const [result] = await db.query('DELETE FROM Vehiculo WHERE patente = ?', [patente]);
+    // Marcar como inactivo
+    const [result] = await db.query('UPDATE Vehiculo SET estado = "inactivo" WHERE patente = ?', [patente]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Vehículo no encontrado' });
@@ -219,11 +218,32 @@ const deleteVehicle = async (req, res) => {
 
 const getVehicles = async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT v.*, m.modelo AS modelo, ma.marca AS marca FROM Vehiculo v JOIN Modelo m ON v.id_modelo = m.id_modelo JOIN Marca ma ON m.id_marca = ma.id_marca');
+    const [rows] = await db.query(`
+      SELECT v.*, m.modelo AS modelo, ma.marca AS marca 
+      FROM Vehiculo v 
+      JOIN Modelo m ON v.id_modelo = m.id_modelo 
+      JOIN Marca ma ON m.id_marca = ma.id_marca
+      WHERE v.estado != 'inactivo'
+    `);
     res.status(200).json(rows);
   } catch (error) {
-    console.error('Error al obtener los vehiculos:', error);
-    res.status(500).json({ error: 'Error al obtener los vehiculos' });
+    console.error('Error al obtener los vehículos:', error);
+    res.status(500).json({ error: 'Error al obtener los vehículos' });
+  }
+};
+
+const getVehiclesAdmin = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT v.*, m.modelo AS modelo, ma.marca AS marca 
+      FROM Vehiculo v 
+      JOIN Modelo m ON v.id_modelo = m.id_modelo 
+      JOIN Marca ma ON m.id_marca = ma.id_marca
+    `); // No filtramos inactivos aquí
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error al obtener los vehículos (admin):', error);
+    res.status(500).json({ error: 'Error al obtener los vehículos' });
   }
 };
 
@@ -249,4 +269,5 @@ module.exports = {
   deleteVehicle,
   getVehicles,
   getAvailableVehiclesByDate,
+  getVehiclesAdmin,
 };

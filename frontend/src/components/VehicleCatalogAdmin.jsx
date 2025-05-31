@@ -7,16 +7,16 @@ export default function VehicleCatalogToReserve() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getVehiculos = async () => {
+    const getVehiculosAdmin = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/vehicles/getVehicles");
+        const response = await axios.get("http://localhost:3000/api/vehicles/getVehiclesAdmin");
         setVehiculos(response.data);
       } catch (error) {
         console.error("Error al obtener los vehículos:", error);
       }
     };
 
-    getVehiculos();
+    getVehiculosAdmin();
   }, []);
 
   const handleReservar = (idVehiculo, idSucursal) => {
@@ -41,9 +41,16 @@ export default function VehicleCatalogToReserve() {
 
           <div className="p-4">
             <h2 className="text-lg font-semibold mb-2">{vehiculo.marca} {vehiculo.modelo}</h2>
-            <p className="text-gray-700">Año: {vehiculo.año}</p>
-            <p className="text-gray-700">Estado: {vehiculo.estado}</p>
-            <p className="text-gray-700 mb-4">Precio por día: ${vehiculo.precioPorDia}</p>
+            <p className="text-gray-700 mb-2">Patente: {vehiculo.patente}</p>
+            <p className="text-gray-700 mb-2">Año: {vehiculo.año}</p>
+            <p className="text-gray-700 mb-2">Estado: {vehiculo.estado}</p>
+            {vehiculo.estado === "inactivo" && (
+              <p className="text-red-600 font-semibold mb-2">🚫 Vehículo inactivo</p>
+            )}
+
+            <p className="text-gray-700 mb-2">Precio por día: ${vehiculo.precioPorDia}</p>
+            <p className="text-gray-700 mb-2">Último mantenimiento: {new Date(vehiculo.ultimo_mantenimiento).toLocaleDateString('es-ES')}</p>
+            <p className="text-gray-700 mb-2">Política de devolución: ${vehiculo.politica_devolucion}%</p>
 
           </div>
         </div>
