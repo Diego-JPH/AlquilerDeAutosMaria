@@ -234,21 +234,28 @@ const getVehicles = async (req, res) => {
 
 const getVehiclesAdmin = async (req, res) => {
   try {
-    const { estado } = req.query;
+    const { patente } = req.query;
+
     let query = `
       SELECT v.*, m.modelo AS modelo, ma.marca AS marca 
       FROM Vehiculo v 
       JOIN Modelo m ON v.id_modelo = m.id_modelo 
       JOIN Marca ma ON m.id_marca = ma.id_marca
     `;
-    
+
     const params = [];
-    if (estado) {
-      query += ` WHERE v.estado = ?`;
-      params.push(estado);
+
+    if (patente) {
+      query += ` WHERE v.patente LIKE ?`;
+      params.push(`${patente}%`);
     }
 
     const [rows] = await db.query(query, params);
+
+    if (patente && rows.length === 0) {
+      return res.status(404).json({ mensaje: 'No se encontró ningún vehículo con la patente indicada' });
+    }
+
     res.status(200).json(rows);
   } catch (error) {
     console.error('Error al obtener los vehículos (admin):', error);
