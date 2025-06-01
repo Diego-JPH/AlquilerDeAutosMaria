@@ -76,14 +76,6 @@ export default function VehicleCatalogToReserve() {
               </p>
               <p className="text-gray-700 mb-2">Política de devolución: ${vehiculo.politica_devolucion}%</p>
 
-              {vehiculo.estado === "disponible" && (
-                <button
-                  onClick={() => handleReservar(vehiculo.id_vehiculo, vehiculo.id_sucursal)}
-                  className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-                >
-                  Reservar
-                </button>
-              )}
             </div>
           </div>
         ))}
