@@ -81,68 +81,47 @@ export default function CreateReserveForm() {
 
   const edadConductor = calcularEdad(formData.fechaN);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!token) {
-      toast.error("Debe iniciar sesión para realizar una reserva.");
-      return;
-    }
+  if (!token) {
+    toast.error("Debe iniciar sesión para realizar una reserva.");
+    return;
+  }
 
-    if (new Date(formData.fecha_inicio) >= new Date(formData.fecha_fin)) {
-      toast.error("La fecha de inicio debe ser anterior a la fecha de fin.");
-      return;
-    }
+  if (new Date(formData.fecha_inicio) >= new Date(formData.fecha_fin)) {
+    toast.error("La fecha de inicio debe ser anterior a la fecha de fin.");
+    return;
+  }
 
-    if (edadConductor < 18) {
-      toast.error("El conductor debe ser mayor de edad (18 años o más).");
-      return;
-    }
+  if (edadConductor < 18) {
+    toast.error("El conductor debe ser mayor de edad (18 años o más).");
+    return;
+  }
 
-    const monto = calcularMonto(formData.fecha_inicio, formData.fecha_fin, precioPorDia);
+  const monto = calcularMonto(formData.fecha_inicio, formData.fecha_fin, precioPorDia);
 
-    if (!monto || isNaN(monto) || monto <= 0) {
-      toast.error("El monto calculado es inválido.");
-      return;
-    }
+  if (!monto || isNaN(monto) || monto <= 0) {
+    toast.error("El monto calculado es inválido.");
+    return;
+  }
 
-    const data = {
-      id_vehiculo: idVehiculo,
-      id_usuario: idUsuario,
-      fechaDesde: formData.fecha_inicio,
-      fechaHasta: formData.fecha_fin,
-      sucursal_retiro_id: parseInt(sucursalRetiro),
-      sucursal_entrega_id: parseInt(formData.sucursal_entrega_id),
-      nombre: formData.nombre,
-      apellido: formData.apellido,
-      fechaN: formData.fechaN,
-      licencia: formData.licencia,
-      monto: monto,
-    };
-
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/reserve/create-reserve",
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      toast.success("Reserva realizada con éxito");
-      // Redirigir a la página de pago con los datos necesarios por query
-      setTimeout(() => {
-        navigate(`/payment?reservaId=${response.data.reservaId}&monto=${monto}`);
-      }, 2000);
-
-    } catch (error) {
-      console.error("Error al realizar la reserva:", error.response);
-      const mensaje = error.response?.data?.error || "Error al realizar la reserva";
-      toast.error(mensaje);
-    }
+  const data = {
+    id_vehiculo: idVehiculo,
+    id_usuario: idUsuario,
+    fechaDesde: formData.fecha_inicio,
+    fechaHasta: formData.fecha_fin,
+    sucursal_retiro_id: parseInt(sucursalRetiro),
+    sucursal_entrega_id: parseInt(formData.sucursal_entrega_id),
+    nombre: formData.nombre,
+    apellido: formData.apellido,
+    fechaN: formData.fechaN,
+    licencia: formData.licencia,
+    monto: monto,
   };
+
+  navigate("/payment", { state: data });
+};
 
   return (
     <>
