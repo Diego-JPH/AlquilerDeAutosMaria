@@ -131,7 +131,7 @@ export default function CreateReserveForm() {
         }
       );
       
-      toast.success("Reserva realizada con éxito");
+      //toast.success("Reserva realizada con éxito");
       // Redirigir a la página de pago con los datos necesarios por query
       setTimeout(() => {
         navigate(`/payment?reservaId=${response.data.reservaId}&monto=${monto}`);
