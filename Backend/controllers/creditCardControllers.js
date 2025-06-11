@@ -15,7 +15,7 @@ const listarTarjetas = async (req, res) => {
 };
 
 const makePayment = async (req, res) => {
-  const { titular, numero, vencimiento, cvv, idReserva, monto } = req.body;
+  const { titular, numero, vencimiento, cvv, monto } = req.body;
 
   try {
     // 1. Validar existencia de la tarjeta

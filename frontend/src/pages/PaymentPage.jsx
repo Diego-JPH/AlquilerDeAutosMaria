@@ -1,4 +1,4 @@
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -6,9 +6,10 @@ import { toast, ToastContainer } from "react-toastify";
 export default function PaymentPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const reservaId = params.get("reservaId");
-  const monto = parseFloat(params.get("monto") || 0);
+  const reservaData = location.state?.reservaData;
+  const monto = parseFloat(reservaData?.monto || 0);
 
   const [formData, setFormData] = useState({
     titular: "",
@@ -25,20 +26,36 @@ export default function PaymentPage() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:3000/api/tarjetas/pago", {
-        ...formData,
-        idReserva: reservaId,
-        monto,
-      });
+    await axios.post("http://localhost:3000/api/tarjetas/pago", {
+      ...formData,
+      monto,
+    });
 
-      toast.success("Pago realizado con éxito.");
-      setTimeout(() => {
-        navigate("/reserve"); // o redireccioná a una pantalla de confirmación
-      }, 2000);
-    } catch (error) {
-      const msg = error.response?.data?.error || "Error al procesar el pago";
-      toast.error(msg);
-    }
+    toast.success("Pago realizado con éxito.");
+  } catch (error) {
+    const msg = error.response?.data?.error || "Error al procesar el pago";
+    toast.error(msg);
+    return; 
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+    await axios.post("http://localhost:3000/api/reserve/create-reserve", {
+        ...reservaData,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    toast.success("Reserva registrada con éxito.");
+    setTimeout(() => {
+      navigate("/reserve");
+    }, 2000);
+  } catch (error) {
+    const msg = error.response?.data?.error || "Error al registrar la reserva";
+    toast.error(msg);
+  }
   };
 
   return (

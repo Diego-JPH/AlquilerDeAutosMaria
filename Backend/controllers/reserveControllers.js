@@ -91,8 +91,43 @@ const cancelReserve = async (req, res) => {
         return res.status(500).json({ error: 'Error al cancelar reserva.' });
     }
 };
-
 const reserveVehicle = async (req, res) => {
+    const {
+        id_vehiculo,
+        fechaDesde,
+        fechaHasta,
+        sucursal_retiro_id,
+        sucursal_entrega_id,
+        nombre,
+        apellido,
+        fechaN,
+        licencia,
+        id_usuario,
+        monto,
+    } = req.body;
+
+    try {
+        const reservaId = await reserveModel.crearReserva({
+            fechaDesde,
+            fechaHasta,
+            id_usuario,
+            id_conductor: (await driverModel.buscarId(licencia))?.id_conductor,
+            id_sucursal_retiro: sucursal_retiro_id,
+            id_sucursal_entrega: sucursal_entrega_id,
+            id_vehiculo,
+            estado: 'activa',
+            monto,
+        });
+
+        return res.status(201).json({ message: 'Reserva realizada con éxito.', reservaId });
+
+    } catch (error) {
+        console.error('Error al crear la reserva:', error);
+        return res.status(500).json({ error: 'Ocurrió un error al procesar la reserva.' });
+    }
+};
+
+const reserveVerification = async (req, res) => {
     const {
         id_vehiculo,
         fechaDesde,
@@ -147,20 +182,7 @@ const reserveVehicle = async (req, res) => {
         if (reservasActivas.length > 0) {
             return res.status(409).json({ error: 'El conductor ya tiene otra reserva activa en ese período.' });
         }
-
-        const reservaId = await reserveModel.crearReserva({
-            fechaDesde,
-            fechaHasta,
-            id_usuario,
-            id_conductor: conductorId,
-            id_sucursal_retiro: sucursal_retiro_id,
-            id_sucursal_entrega: sucursal_entrega_id,
-            id_vehiculo,
-            estado: 'activa',
-            monto,
-        });
-
-        return res.status(201).json({ message: 'Reserva realizada con éxito.', reservaId });
+        return res.status(201).json({ message: 'Reserva realizada con éxito.'});
 
     } catch (error) {
         console.error('Error al crear la reserva:', error);
@@ -215,5 +237,6 @@ module.exports = {
     cancelReserve,
     reserveVehicle,
     listReserveOfUser,
-    getAllReservations
+    getAllReservations,
+    reserveVerification
 };

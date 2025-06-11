@@ -122,23 +122,17 @@ export default function CreateReserveForm() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/reserve/create-reserve",
+        "http://localhost:3000/api/reserve/reserveVerification",
         data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
       );
       
       //toast.success("Reserva realizada con éxito");
       // Redirigir a la página de pago con los datos necesarios por query
       setTimeout(() => {
-        navigate(`/payment?reservaId=${response.data.reservaId}&monto=${monto}`);
+        navigate(`/payment`, {state: { reservaData: data },});
       }, 2000);
 
     } catch (error) {
-      console.error("Error al realizar la reserva:", error.response);
       const mensaje = error.response?.data?.error || "Error al realizar la reserva";
       toast.error(mensaje);
     }
