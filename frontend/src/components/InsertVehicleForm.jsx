@@ -24,6 +24,7 @@ export default function InsertVehicleForm() {
       try {
         const res = await fetch('http://localhost:3000/api/sucursales/getSucursales');
         const data = await res.json();
+        console.log("Sucursales recibidas:", data);
         setSucursales(data);
       } catch (err) {
         console.error('Error al cargar sucursales', err);

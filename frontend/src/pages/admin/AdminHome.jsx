@@ -1,4 +1,5 @@
 import VehicleCatalogAdmin from '../../components/VehicleCatalogAdmin';
+import AmountInPeriod from '../../components/AmountInPeriod';
 
 export default function AdminHome() {
   return (
@@ -6,6 +7,7 @@ export default function AdminHome() {
       <h1 className="text-4xl font-bold text-green-900 mb-6">
         Catálogo
       </h1>
+      <AmountInPeriod />
       <VehicleCatalogAdmin />
     </div>
   );
