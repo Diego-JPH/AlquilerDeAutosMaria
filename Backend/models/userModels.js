@@ -43,11 +43,24 @@ async function obtenerCodigoVerificacion(email) {
   return rows[0];
 }
 
+async function calcularMontoEntreFechas(fechaInicio, fechaFin) {
+  const [result] = await db.execute(
+    `SELECT SUM(monto) AS montoTotal
+     FROM Reserva
+     WHERE fechaDesde <= ? AND fechaHasta >= ?
+       AND estado <> 'cancelada'`,
+    [fechaFin, fechaInicio] // ¡ojo con el orden aquí!
+  );
+
+  return result[0].montoTotal || 0;
+}
+
 module.exports = {
   findUserByEmail,
   insertUser,
   insertCliente,
   findClienteById,
   guardarCodigoVerificacion,
-  obtenerCodigoVerificacion
+  obtenerCodigoVerificacion,
+  calcularMontoEntreFechas
 };

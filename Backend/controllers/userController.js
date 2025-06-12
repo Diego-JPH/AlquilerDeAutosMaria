@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const generarCodigo = () => Math.floor(1000 + Math.random() * 9000);
 const SECRET_KEY = process.env.JWT_SECRET;
 const { sendVerificationEmail } = require('../utils/mailer');
+const { calcularMontoEntreFechas } = require('../models/userModels');
+
 
 const registrarCliente = async (req, res) => {
   const { email, nombre, apellido, contraseña, fechaN } = req.body;
@@ -122,8 +124,35 @@ const verificarCodigo = async (req, res) => {
   }
 };
 
+async function obtenerMontoRecaudado(req, res) {
+  const { fechaInicio, fechaFin } = req.query;
+
+  // Validaciones iniciales
+  if (!fechaInicio || !fechaFin) {
+    return res.status(400).json({ error: 'Se deben ingresar ambas fechas' });
+  }
+
+  // Parseo seguro con dayjs
+  const inicio = dayjs(fechaInicio, 'YYYY-MM-DD');
+  const fin = dayjs(fechaFin, 'YYYY-MM-DD');
+
+  // Validaciones de formato y rango
+  if (!inicio.isValid() || !fin.isValid() || inicio.isAfter(fin)) {
+    return res.status(400).json({ error: 'Fecha inválida' });
+  }
+
+  try {
+    const montoTotal = await calcularMontoEntreFechas(fechaInicio, fechaFin);
+    res.json({ montoTotal });
+  } catch (error) {
+    console.error('Error al calcular el monto recaudado:', error);
+    res.status(500).json({ error: 'Error al calcular el monto recaudado' });
+  }
+}
+
 module.exports = {
   registrarCliente,
   iniciarSesion,
-  verificarCodigo
+  verificarCodigo,
+  obtenerMontoRecaudado
 };

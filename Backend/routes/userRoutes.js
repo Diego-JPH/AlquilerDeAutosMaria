@@ -9,5 +9,6 @@ router.post('/login', userController.iniciarSesion);
 router.post('/recoverPassword', recoverPassword.recoverPassword);
 router.put('/resetPassword', resetPassword.resetPassword);
 router.post('/verificar-codigo', userController.verificarCodigo);
+router.get('/montoRecaudado', userController.obtenerMontoRecaudado);
 
 module.exports = router;
