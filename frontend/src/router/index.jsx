@@ -8,6 +8,7 @@ import RecoverPasswordPage from "../pages/RecoverPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import VerifyCodePage from "../pages/VerifyCodePage";
 import Home from "../pages/Home"; // Vista central que redirige a cliente/admin o vista pública
+import RegisterEmployeePage from "../pages/RegisterEmployeePage";
 
 // Cliente
 import CreateReserve from "../pages/CreateReserve";
@@ -17,6 +18,8 @@ import PaymentPage from "../pages/PaymentPage";
 // Admin
 import ManageVehicles from "../pages/ManageVehicles";
 import ReservationsAdminPage from "../pages/ReservationAdminPage";
+
+//Empleado
 
 export default function AppRouter({ isLoggedIn, onLogout }) {
   return (
@@ -31,6 +34,7 @@ export default function AppRouter({ isLoggedIn, onLogout }) {
           <Route path="/recoverPassword" element={<RecoverPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verificarCodigo" element={<VerifyCodePage />} />
+          <Route path="/registerEmployee" element={<RegisterEmployeePage />} />
 
           {/* Cliente */}
           <Route path="/create-reserve" element={<CreateReserve />} />

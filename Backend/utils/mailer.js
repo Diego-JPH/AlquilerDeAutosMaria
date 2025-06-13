@@ -42,7 +42,18 @@ const sendVerificationEmail = async (to, codigo) => {
   });
 };
 
+async function enviarEmailRegistro(destinatario, nombre, contraseña) {
+  const mailOptions = {
+    from: `"Alquiler de Autos María" <alquileresdeautosmaria@gmail.com>`,
+    to: destinatario,
+    subject: 'Registro de Empleado',
+    text: `Hola ${nombre}, tu contraseña temporal es: ${contraseña}`
+  };
+  await transporter.sendMail(mailOptions);
+}
+
 module.exports = { 
   sendRecoveryEmail,
-  sendVerificationEmail 
+  sendVerificationEmail,
+  enviarEmailRegistro
 };

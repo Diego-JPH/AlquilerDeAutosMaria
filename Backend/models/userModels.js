@@ -55,6 +55,13 @@ async function calcularMontoEntreFechas(fechaInicio, fechaFin) {
   return result[0].montoTotal || 0;
 }
 
+async function insertEmployee(id_usuario, id_sucursal) {
+  await db.query(
+    'INSERT INTO Empleado (id_usuario, id_sucursal) VALUES (?, ?)',
+    [id_usuario, id_sucursal]
+  );
+}
+
 module.exports = {
   findUserByEmail,
   insertUser,
@@ -62,5 +69,6 @@ module.exports = {
   findClienteById,
   guardarCodigoVerificacion,
   obtenerCodigoVerificacion,
-  calcularMontoEntreFechas
+  calcularMontoEntreFechas,
+  insertEmployee
 };
