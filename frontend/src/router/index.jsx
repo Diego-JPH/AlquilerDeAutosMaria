@@ -20,6 +20,7 @@ import ManageVehicles from "../pages/ManageVehicles";
 import ReservationsAdminPage from "../pages/ReservationAdminPage";
 
 //Empleado
+import EmployeeReserve from "../pages/employee/ReservationEmployeePage";
 
 export default function AppRouter({ isLoggedIn, onLogout }) {
   return (
@@ -44,6 +45,9 @@ export default function AppRouter({ isLoggedIn, onLogout }) {
           {/* Admin */}
           <Route path="/manageVehicles" element={<ManageVehicles />} />
           <Route path="/adminReserve" element={<ReservationsAdminPage />} />
+
+          {/* Empleado */}
+          <Route path="/employeeReserve" element={<EmployeeReserve />} />
         </Routes>
       </MainLayout>
     </Router>

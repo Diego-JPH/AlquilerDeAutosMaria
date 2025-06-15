@@ -199,6 +199,30 @@ async function marcarReservasFinalizadas() {
     const query = `UPDATE Reserva SET estado = 'finalizada' WHERE estado = 'activa' AND fechaHasta < NOW()`;
     await db.query(query);
 }
+const getReservasBySucursal = async (idSucursal) => {
+    const [rows] = await db.query(
+        `
+        SELECT 
+            r.id_reserva,
+            r.fechaDesde,
+            r.fechaHasta,
+            r.estado,
+            r.monto,
+            u.nombre,
+            u.apellido,
+            m.marca,
+            mo.modelo
+        FROM Reserva r
+        JOIN Usuario u ON r.id_usuario = u.id_usuario
+        JOIN Vehiculo v ON r.id_vehiculo = v.id_vehiculo
+        JOIN Modelo mo ON v.id_modelo = mo.id_modelo
+        JOIN Marca m ON mo.id_marca = m.id_marca
+        WHERE r.id_sucursal_retiro = ?
+        `,
+        [idSucursal]
+    );
+    return rows;
+};
 
 module.exports = {
     eliminarConductor,
@@ -221,5 +245,6 @@ module.exports = {
     crearReserva,
     obtenerEstadoReserva,
     getReservationsPerUser,
-    marcarReservasFinalizadas
+    marcarReservasFinalizadas,
+    getReservasBySucursal
 };

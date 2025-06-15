@@ -41,6 +41,11 @@ const iniciarSesion = async (req, res) => {
     return res.status(401).json({ mensaje: "El email o la contraseña son incorrectos" });
   }
 
+  let sucursal = null;
+  if (usuario.rol === 'admin' || usuario.rol === 'empleado') {
+    const id_sucursal = await userModel.obtenerSucursalPorUsuario(usuario.id_usuario);
+    sucursal = { id_sucursal };  // ahora sucursal es un objeto con la forma que esperás
+  }
   // Si el rol es administrador, enviamos un código de verificación
   if (usuario.rol === 'admin') {
     const codigo = generarCodigo();
@@ -62,18 +67,24 @@ const iniciarSesion = async (req, res) => {
 
   // Generar token
   const token = jwt.sign(
-    { id: usuario.id_usuario, rol: usuario.rol, nombre: usuario.nombre },
+    {
+      id: usuario.id_usuario,
+      rol: usuario.rol,
+      nombre: usuario.nombre,
+      sucursal
+    },
     SECRET_KEY,
     { expiresIn: '1h' }
   );
 
-  res.status(200).json({
+  return res.status(200).json({
     token,
     usuario: {
       id: usuario.id_usuario,
       nombre: usuario.nombre,
       rol: usuario.rol,
-      email: usuario.email
+      email: usuario.email,
+      sucursal
     }
   });
 };

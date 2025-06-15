@@ -182,7 +182,7 @@ const reserveVerification = async (req, res) => {
         if (reservasActivas.length > 0) {
             return res.status(409).json({ error: 'El conductor ya tiene otra reserva activa en ese período.' });
         }
-        return res.status(201).json({ message: 'Reserva realizada con éxito.'});
+        return res.status(201).json({ message: 'Reserva realizada con éxito.' });
 
     } catch (error) {
         console.error('Error al crear la reserva:', error);
@@ -203,33 +203,54 @@ const listReserveOfUser = async (req, res) => {
 };
 
 const getAllReservations = async (req, res) => {
-  try {
-    const [rows] = await db.query(`
-      SELECT 
-        r.id_reserva,
-        r.fechaDesde,
-        r.fechaHasta,
-        r.estado,
-        r.monto,
-        u.nombre AS nombre_usuario,
-        u.apellido AS apellido_usuario,
-        v.patente,
-        m.modelo,
-        ma.marca
-      FROM Reserva r
-      LEFT JOIN Usuario u ON r.id_usuario = u.id_usuario
-      LEFT JOIN Vehiculo v ON r.id_vehiculo = v.id_vehiculo
-      LEFT JOIN Modelo m ON v.id_modelo = m.id_modelo
-      LEFT JOIN Marca ma ON m.id_marca = ma.id_marca
-      ORDER BY r.fechaDesde DESC
+    try {
+        const [rows] = await db.query(`
+        SELECT 
+            r.id_reserva,
+            r.fechaDesde,
+            r.fechaHasta,
+            r.estado,
+            r.monto,
+            u.nombre AS nombre_usuario,
+            u.apellido AS apellido_usuario,
+            v.patente,
+            m.modelo,
+            ma.marca
+        FROM Reserva r
+        LEFT JOIN Usuario u ON r.id_usuario = u.id_usuario
+        LEFT JOIN Vehiculo v ON r.id_vehiculo = v.id_vehiculo
+        LEFT JOIN Modelo m ON v.id_modelo = m.id_modelo
+        LEFT JOIN Marca ma ON m.id_marca = ma.id_marca
+        ORDER BY r.fechaDesde DESC
     `);
 
-    //console.log("🔎 Reservas encontradas:", rows);
-    res.json(rows);
-  } catch (error) {
-    console.error("❌ Error al obtener las reservas:", error);
-    res.status(500).json({ error: "Error al obtener las reservas" });
-  }
+        //console.log("🔎 Reservas encontradas:", rows);
+        res.json(rows);
+    } catch (error) {
+        console.error("❌ Error al obtener las reservas:", error);
+        res.status(500).json({ error: "Error al obtener las reservas" });
+    }
+};
+
+const getReservasPorSucursal = async (req, res) => {
+    try {
+        const { rol, sucursal } = req.usuario;
+
+        if (rol !== 'empleado' && rol !== 'admin') {
+            return res.status(403).json({ error: "Acceso denegado" });
+        }
+
+        if (!sucursal || !sucursal.id_sucursal) {
+            return res.status(400).json({ error: "No se encontró información de sucursal en el token" });
+        }
+
+        const id_sucursal = sucursal.id_sucursal;
+        const reservas = await reserveModel.getReservasBySucursal(id_sucursal);
+        return res.json(reservas);
+    } catch (error) {
+        console.error("Error al obtener reservas:", error);
+        return res.status(500).json({ error: "Error interno del servidor" });
+    }
 };
 
 module.exports = {
@@ -238,5 +259,6 @@ module.exports = {
     reserveVehicle,
     listReserveOfUser,
     getAllReservations,
-    reserveVerification
+    reserveVerification,
+    getReservasPorSucursal
 };

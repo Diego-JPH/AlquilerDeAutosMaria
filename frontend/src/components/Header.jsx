@@ -52,7 +52,10 @@ export default function Header({ isLoggedIn, onLogout }) {
                 <Link to="/manageVehicles" className="hover:underline">Administrar vehículos</Link>
               </>
             )}
-
+            {/* Mostrar botón "Reservas" solo si el rol es empleado */}
+            {rol === 'empleado' && (
+              <Link to="/employeeReserve" className="hover:underline">Reservas</Link>
+            )}
 
             <button onClick={onLogout} className="hover:underline">Cerrar sesión</button>
           </>

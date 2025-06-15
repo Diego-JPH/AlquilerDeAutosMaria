@@ -1,6 +1,7 @@
 import PublicHome from "./PublicHome";
 import ClientHome from "./client/ClientHome";
 import AdminHome from "./admin/AdminHome";
+import EmployeeHome from "./employee/EmployeeHome";
 import { jwtDecode } from "jwt-decode";
 
 export default function Home() {
@@ -30,6 +31,9 @@ export default function Home() {
 
   if (datos?.rol === "cliente") {
     return <ClientHome />;
+  }
+  if (datos?.rol === "empleado") {
+    return <EmployeeHome />;
   }
 
   return <PublicHome />;

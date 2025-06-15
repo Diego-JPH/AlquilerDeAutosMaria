@@ -62,6 +62,14 @@ async function insertEmployee(id_usuario, id_sucursal) {
   );
 }
 
+async function obtenerSucursalPorUsuario(id_usuario) {
+  const [rows] = await db.query(
+    'SELECT id_sucursal FROM Empleado WHERE id_usuario = ?',
+    [id_usuario]
+  );
+  return rows[0]?.id_sucursal || null;
+}
+
 module.exports = {
   findUserByEmail,
   insertUser,
@@ -70,5 +78,6 @@ module.exports = {
   guardarCodigoVerificacion,
   obtenerCodigoVerificacion,
   calcularMontoEntreFechas,
-  insertEmployee
+  insertEmployee,
+  obtenerSucursalPorUsuario
 };
