@@ -253,6 +253,40 @@ const getReservasPorSucursal = async (req, res) => {
     }
 };
 
+async function marcarEntrega(req, res) {
+    const { idReserva } = req.body;
+    const idSucursal = req.sucursal?.id_sucursal;
+
+    if (!idReserva) {
+        return res.status(400).json({ error: "ID de reserva es obligatorio." });
+    }
+
+    try {
+        const reserva = await reserveModel.obtenerReservaPorId(idReserva);
+
+        if (!reserva) {
+            return res.status(404).json({ error: "Reserva no encontrada." });
+        }
+
+        if (reserva.id_sucursal !== idSucursal) {
+            return res
+                .status(403)
+                .json({ error: "No tienes acceso a esta reserva." });
+        }
+
+        const actualizado = await reserveModel.actualizarEstadoVehiculo(idReserva, "Entregado");
+
+        if (!actualizado) {
+            return res.status(500).json({ error: "No se pudo actualizar el estado." });
+        }
+
+        res.json({ mensaje: "Vehículo marcado como entregado." });
+    } catch (error) {
+        console.error("Error al marcar entrega:", error);
+        res.status(500).json({ error: "Error interno del servidor." });
+    }
+}
+
 module.exports = {
     changeDriver,
     cancelReserve,
@@ -260,5 +294,6 @@ module.exports = {
     listReserveOfUser,
     getAllReservations,
     reserveVerification,
-    getReservasPorSucursal
+    getReservasPorSucursal,
+    marcarEntrega,
 };
