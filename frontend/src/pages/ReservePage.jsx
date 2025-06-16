@@ -230,6 +230,9 @@ export default function ReservePage() {
                         return (
                             <li key={reserva.id} className="border border-gray-300 rounded-lg p-4">
                                 <p>
+                                    <strong>ID de la reserva:</strong> {reserva.id}
+                                </p>
+                                <p>
                                     <strong>Auto:</strong> {reserva.marca} {reserva.modelo}
                                 </p>
                                 <p>
