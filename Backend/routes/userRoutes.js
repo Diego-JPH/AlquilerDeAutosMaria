@@ -12,6 +12,7 @@ router.put('/resetPassword', resetPassword.resetPassword);
 router.post('/verificar-codigo', userController.verificarCodigo);
 router.get('/montoRecaudado', userController.obtenerMontoRecaudado);
 router.post('/registrar-empleado', registrarEmpleado.registrarEmpleado);
+router.get('/empleados', registrarEmpleado.listarEmpleados);
 
 
 module.exports = router;
