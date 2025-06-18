@@ -1,5 +1,4 @@
 const db = require('../config/db');
-const { eliminarEmpleado } = require('../controllers/employeeController');
 
 const findUserByEmail = async (email) => {
   const [rows] = await db.query('SELECT * FROM Usuario WHERE email = ?', [email]);
