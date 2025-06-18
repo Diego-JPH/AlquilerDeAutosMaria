@@ -35,11 +35,12 @@ async function listarEmpleados(req, res) {
       FROM Empleado e
       JOIN Usuario u ON e.id_usuario = u.id_usuario
       JOIN Sucursal s ON e.id_sucursal = s.id_sucursal
+      WHERE e.activo = 1
     `;
     const params = [];
 
     if (idSucursal) {
-      query += ' WHERE e.id_sucursal = ?';
+      query += ' AND e.id_sucursal = ?';
       params.push(idSucursal);
     }
 
@@ -60,7 +61,28 @@ async function listarEmpleados(req, res) {
   }
 }
 
+async function eliminarEmpleado(req, res) {
+  const id_usuario = req.params.id;
+
+  try {
+    const [result] = await db.query(
+      'UPDATE Empleado SET activo = 0 WHERE id_usuario = ?',
+      [id_usuario]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ mensaje: 'Empleado no encontrado' });
+    }
+
+    return res.status(200).json({ mensaje: 'Empleado eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar empleado:', error);
+    return res.status(500).json({ mensaje: 'Error al eliminar empleado' });
+  }
+}
+
 module.exports = {
   registrarEmpleado,
-  listarEmpleados
+  listarEmpleados,
+  eliminarEmpleado,
 };

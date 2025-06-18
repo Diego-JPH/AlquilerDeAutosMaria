@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 function EmployeeList() {
   const [empleados, setEmpleados] = useState([]);
@@ -35,6 +37,48 @@ function EmployeeList() {
     }
   };
 
+const eliminarEmpleado = (id) => {
+  toast.info(
+    ({ closeToast }) => (
+      <div>
+        <p>¿Estás seguro de que deseas eliminar este empleado?</p>
+        <div className="mt-2 flex justify-end gap-2">
+          <button
+            onClick={async () => {
+              try {
+                const res = await axios.delete(`http://localhost:3000/api/user/empleados/${id}`);
+                toast.success(res.data.mensaje || "Empleado eliminado");
+                cargarEmpleados(); // refrescar lista
+                closeToast(); // cerrar el toast de confirmación
+              } catch (err) {
+                console.error(err);
+                toast.error("Error al eliminar empleado");
+              }
+            }}
+            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+          >
+            Sí, eliminar
+          </button>
+
+          <button
+            onClick={closeToast}
+            className="bg-gray-300 text-black px-3 py-1 rounded hover:bg-gray-400"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    ),
+    {
+      autoClose: false, // importante: no cerrar automáticamente
+      closeOnClick: false,
+      draggable: false,
+      closeButton: false,
+    }
+  );
+};
+
+
   useEffect(() => {
     cargarSucursales();
     cargarEmpleados();
@@ -68,13 +112,17 @@ function EmployeeList() {
 
       <ul className="space-y-2">
         {empleados.map((emp) => (
-          <li
-            key={emp.id_usuario}
-            className="border p-3 rounded shadow-sm flex justify-between"
+          <li key={emp.id_usuario} className="border p-3 rounded shadow-sm flex justify-between items-center">
+          <div>
+            {emp.nombre} {emp.apellido} ({emp.email}) - {emp.sucursal}
+          </div>
+          <button
+            onClick={() => eliminarEmpleado(emp.id_usuario)}
+            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
           >
-            <span>{emp.nombre} {emp.apellido} ({emp.email})</span>
-            <span className="text-sm text-gray-500">{emp.sucursal}</span>
-          </li>
+            Eliminar
+          </button>
+        </li>
         ))}
       </ul>
     </div>
