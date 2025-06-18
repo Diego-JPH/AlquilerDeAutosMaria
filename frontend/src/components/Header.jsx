@@ -50,7 +50,7 @@ export default function Header({ isLoggedIn, onLogout }) {
               <>
                 <Link to="/adminReserve" className="hover:underline">Lista de reservas</Link>
                 <Link to="/manageVehicles" className="hover:underline">Administrar vehículos</Link>
-                <Link to="/registerEmployee" className="hover:underline">Añadir empleado</Link>
+                <Link to="/registerEmployee" className="hover:underline">Administrar empleados</Link>
               </>
             )}
             {/* Mostrar botón "Reservas" solo si el rol es empleado */}

@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { eliminarEmpleado } = require('../controllers/employeeController');
 
 const findUserByEmail = async (email) => {
   const [rows] = await db.query('SELECT * FROM Usuario WHERE email = ?', [email]);
@@ -70,6 +71,33 @@ async function obtenerSucursalPorUsuario(id_usuario) {
   return rows[0]?.id_sucursal || null;
 }
 
+async function getEmpleados(id_sucursal) {
+  let query = `
+    SELECT u.id_usuario, u.nombre, u.apellido, u.email, s.sucursal
+    FROM Empleado e
+    JOIN Usuario u ON e.id_usuario = u.id_usuario
+    JOIN Sucursal s ON e.id_sucursal = s.id_sucursal
+    WHERE e.activo = 1
+  `;
+  const params = [];
+
+  if (id_sucursal) {
+    query += ' AND e.id_sucursal = ?';
+    params.push(id_sucursal);
+  }
+
+  const [rows] = await db.query(query, params);
+  return rows;
+}
+
+async function deleteEmpleado(id_usuario) {
+  const [result] = await db.query(
+    'UPDATE Empleado SET activo = 0 WHERE id_usuario = ?',
+    [id_usuario]
+  );
+  return result;
+}
+
 module.exports = {
   findUserByEmail,
   insertUser,
@@ -79,5 +107,7 @@ module.exports = {
   obtenerCodigoVerificacion,
   calcularMontoEntreFechas,
   insertEmployee,
-  obtenerSucursalPorUsuario
+  obtenerSucursalPorUsuario,
+  getEmpleados,
+  deleteEmpleado,
 };
