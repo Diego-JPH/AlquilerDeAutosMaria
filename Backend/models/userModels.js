@@ -96,6 +96,28 @@ async function deleteEmpleado(id_usuario) {
   );
   return result;
 }
+const esEmpleado = async (id_usuario) => {
+  const [rows] = await db.query(
+    'SELECT * FROM Empleado WHERE id_usuario = ?',
+    [id_usuario]
+  );
+  return rows.length > 0;
+};
+
+const obtenerIdSucursalPorNombre = async (nombre) => {
+  const [rows] = await db.query(
+    'SELECT id_sucursal FROM Sucursal WHERE sucursal = ?',
+    [nombre]
+  );
+  return rows[0]?.id_sucursal || null;
+};
+
+const actualizarSucursalEmpleado = async (id_usuario, id_sucursal) => {
+  await db.query(
+    'UPDATE Empleado SET id_sucursal = ? WHERE id_usuario = ?',
+    [id_sucursal, id_usuario]
+  );
+};
 
 module.exports = {
   findUserByEmail,
@@ -109,4 +131,7 @@ module.exports = {
   obtenerSucursalPorUsuario,
   getEmpleados,
   deleteEmpleado,
+  esEmpleado,
+  obtenerIdSucursalPorNombre,
+  actualizarSucursalEmpleado
 };
