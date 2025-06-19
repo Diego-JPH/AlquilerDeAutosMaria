@@ -22,6 +22,7 @@ import ActualizarSucursal from "../pages/ActualizarSucursal"; // 👈 Import nue
 
 // Empleado
 import EmployeeReserve from "../pages/employee/ReservationEmployeePage";
+import RegisterClientePorEmpleadoForm from "../components/RegisterFormEmpleado";
 
 export default function AppRouter({ isLoggedIn, onLogout }) {
   return (
@@ -50,6 +51,7 @@ export default function AppRouter({ isLoggedIn, onLogout }) {
 
           {/* Empleado */}
           <Route path="/employeeReserve" element={<EmployeeReserve />} />
+          <Route path="/registrar-cliente" element={<RegisterClientePorEmpleadoForm />} />
         </Routes>
       </MainLayout>
     </Router>

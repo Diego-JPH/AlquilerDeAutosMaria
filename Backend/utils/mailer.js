@@ -52,8 +52,24 @@ async function enviarEmailRegistro(destinatario, nombre, contraseña) {
   await transporter.sendMail(mailOptions);
 }
 
+async function enviarEmailRegistroEmpleado(destinatario, nombre, contraseña) {
+  const mailOptions = {
+    from: `"Alquiler de Autos María" <alquileresdeautosmaria@gmail.com>`,
+    to: destinatario,
+    subject: 'Tu cuenta en Alquiler de Autos María',
+    html: `
+      <p>Hola ${nombre},</p>
+      <p>Tu cuenta ha sido creada exitosamente.</p>
+      <p>Tu contraseña temporal es: <strong>${contraseña}</strong></p>
+      <p>Por favor, iniciá sesión y cambiá tu contraseña.</p>
+    `
+  };
+  await transporter.sendMail(mailOptions);
+}
+
 module.exports = { 
   sendRecoveryEmail,
   sendVerificationEmail,
-  enviarEmailRegistro
+  enviarEmailRegistro,
+  enviarEmailRegistroEmpleado
 };
