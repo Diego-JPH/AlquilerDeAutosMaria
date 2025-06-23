@@ -1,5 +1,6 @@
 import MarkDeliveryForm from "../../components/MarkDeliveryForm";
 import RegisterReturn from "../../components/RegisterReturn";
+import VehicleCatalogEmpleado from '../../components/VehicleCatalogEmpleado';
 
 export default function EmployeeHome() {
     return (
@@ -15,6 +16,10 @@ export default function EmployeeHome() {
             <MarkDeliveryForm />
             {/* Componente para registrar devolución */}
             <RegisterReturn />
+            <h1 className="text-3xl font-bold text-green-900 mb-4">
+                Vehículos de la sucursal
+            </h1>
+            <VehicleCatalogEmpleado />
         </div>
     );
 }

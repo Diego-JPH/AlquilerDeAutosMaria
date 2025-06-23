@@ -70,6 +70,63 @@ async function obtenerSucursalPorUsuario(id_usuario) {
   return rows[0]?.id_sucursal || null;
 }
 
+async function getEmpleados(id_sucursal) {
+  let query = `
+    SELECT u.id_usuario, u.nombre, u.apellido, u.email, s.sucursal
+    FROM Empleado e
+    JOIN Usuario u ON e.id_usuario = u.id_usuario
+    JOIN Sucursal s ON e.id_sucursal = s.id_sucursal
+    WHERE e.activo = 1
+  `;
+  const params = [];
+
+  if (id_sucursal) {
+    query += ' AND e.id_sucursal = ?';
+    params.push(id_sucursal);
+  }
+
+  const [rows] = await db.query(query, params);
+  return rows;
+}
+
+async function deleteEmpleado(id_usuario) {
+  const [result] = await db.query(
+    'UPDATE Empleado SET activo = 0 WHERE id_usuario = ?',
+    [id_usuario]
+  );
+  return result;
+}
+const esEmpleado = async (id_usuario) => {
+  const [rows] = await db.query(
+    'SELECT * FROM Empleado WHERE id_usuario = ?',
+    [id_usuario]
+  );
+  return rows.length > 0;
+};
+
+const obtenerIdSucursalPorNombre = async (nombre) => {
+  const [rows] = await db.query(
+    'SELECT id_sucursal FROM Sucursal WHERE sucursal = ?',
+    [nombre]
+  );
+  return rows[0]?.id_sucursal || null;
+};
+
+const actualizarSucursalEmpleado = async (id_usuario, id_sucursal) => {
+  await db.query(
+    'UPDATE Empleado SET id_sucursal = ? WHERE id_usuario = ?',
+    [id_sucursal, id_usuario]
+  );
+};
+
+const getSucursalDelEmpleado = async (idUsuario) => {
+  const [rows] = await db.query(
+    'SELECT id_sucursal FROM Empleado WHERE id_usuario = ? AND activo = 1',
+    [idUsuario]
+  );
+  return rows[0]; // puede ser undefined
+};
+
 module.exports = {
   findUserByEmail,
   insertUser,
@@ -79,5 +136,11 @@ module.exports = {
   obtenerCodigoVerificacion,
   calcularMontoEntreFechas,
   insertEmployee,
-  obtenerSucursalPorUsuario
+  obtenerSucursalPorUsuario,
+  getEmpleados,
+  deleteEmpleado,
+  esEmpleado,
+  obtenerIdSucursalPorNombre,
+  actualizarSucursalEmpleado,
+  getSucursalDelEmpleado,
 };

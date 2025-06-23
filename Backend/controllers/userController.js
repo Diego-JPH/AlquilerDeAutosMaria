@@ -4,8 +4,9 @@ const jwt = require('jsonwebtoken');
 const generarCodigo = () => Math.floor(1000 + Math.random() * 9000);
 const SECRET_KEY = process.env.JWT_SECRET;
 const { sendVerificationEmail } = require('../utils/mailer');
+const { enviarEmailRegistroEmpleado } = require('../utils/mailer');
 const { calcularMontoEntreFechas } = require('../models/userModels');
-
+const { generarPasswordAleatoria } = require('../utils/randomPassword');
 
 const registrarCliente = async (req, res) => {
   const { email, nombre, apellido, contraseña, fechaN } = req.body;
@@ -161,9 +162,33 @@ async function obtenerMontoRecaudado(req, res) {
   }
 }
 
+const registrarClientePorEmpleado = async (req, res) => {
+  const { email, nombre, apellido, fechaN } = req.body;
+
+  const existente = await userModel.findUserByEmail(email);
+  if (existente) {
+    return res.status(400).json({ mensaje: 'El email ya está registrado' });
+  }
+
+  const edad = dayjs().diff(dayjs(fechaN), 'year');
+  if (edad < 18) {
+    return res.status(400).json({ mensaje: 'El cliente debe ser mayor de edad' });
+  }
+
+  const contraseña = generarPasswordAleatoria();
+
+  const id_usuario = await userModel.insertUser(email, nombre, apellido, contraseña, 'cliente');
+  await userModel.insertCliente(id_usuario, fechaN);
+
+  await enviarEmailRegistroEmpleado(email, nombre, contraseña);
+
+  return res.status(201).json({ mensaje: 'Cliente registrado correctamente y contraseña enviada por mail' });
+};
+
 module.exports = {
   registrarCliente,
   iniciarSesion,
   verificarCodigo,
-  obtenerMontoRecaudado
+  obtenerMontoRecaudado,
+  registrarClientePorEmpleado
 };

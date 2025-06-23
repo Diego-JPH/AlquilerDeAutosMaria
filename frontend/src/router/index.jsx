@@ -18,9 +18,11 @@ import PaymentPage from "../pages/PaymentPage";
 // Admin
 import ManageVehicles from "../pages/ManageVehicles";
 import ReservationsAdminPage from "../pages/ReservationAdminPage";
+import ActualizarSucursal from "../pages/ActualizarSucursal"; // 👈 Import nuevo
 
-//Empleado
+// Empleado
 import EmployeeReserve from "../pages/employee/ReservationEmployeePage";
+import RegisterClientePorEmpleadoForm from "../components/RegisterFormEmpleado";
 
 export default function AppRouter({ isLoggedIn, onLogout }) {
   return (
@@ -45,9 +47,11 @@ export default function AppRouter({ isLoggedIn, onLogout }) {
           {/* Admin */}
           <Route path="/manageVehicles" element={<ManageVehicles />} />
           <Route path="/adminReserve" element={<ReservationsAdminPage />} />
+          <Route path="/admin/actualizar-sucursal" element={<ActualizarSucursal />} /> 
 
           {/* Empleado */}
           <Route path="/employeeReserve" element={<EmployeeReserve />} />
+          <Route path="/registrar-cliente" element={<RegisterClientePorEmpleadoForm />} />
         </Routes>
       </MainLayout>
     </Router>

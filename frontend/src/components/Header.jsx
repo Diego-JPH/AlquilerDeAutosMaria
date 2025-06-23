@@ -40,21 +40,24 @@ export default function Header({ isLoggedIn, onLogout }) {
 
         {isLoggedIn && (
           <>
-            {/* Mostrar botón "Reservas" solo si el rol es cliente */}
             {rol === 'cliente' && (
               <Link to="/reserve" className="hover:underline">Reservas</Link>
             )}
 
-            {/* Mostrar botón "Administrar vehículos" solo si el rol es admin */}
             {rol === 'admin' && (
               <>
                 <Link to="/adminReserve" className="hover:underline">Lista de reservas</Link>
                 <Link to="/manageVehicles" className="hover:underline">Administrar vehículos</Link>
+                <Link to="/registerEmployee" className="hover:underline">Administrar empleados</Link>
+                <Link to="/admin/actualizar-sucursal" className="hover:underline">Actualizar sucursal de empleado</Link>
               </>
             )}
-            {/* Mostrar botón "Reservas" solo si el rol es empleado */}
+
             {rol === 'empleado' && (
-              <Link to="/employeeReserve" className="hover:underline">Reservas</Link>
+              <>
+                <Link to="/employeeReserve" className="hover:underline">Reservas</Link>
+                <Link to="/registrar-cliente" className="hover:underline">Registrar Cliente</Link>
+              </>
             )}
 
             <button onClick={onLogout} className="hover:underline">Cerrar sesión</button>

@@ -22,6 +22,17 @@ const getVehiclesAvailableBetweenDates = async (fechaDesde, fechaHasta) => {
   return rows;
 };
 
+const getVehiculosPorSucursal = async (idSucursal) => {
+  const [rows] = await db.query(`
+    SELECT v.*, m.modelo AS modelo, ma.marca AS marca 
+    FROM Vehiculo v 
+    JOIN Modelo m ON v.id_modelo = m.id_modelo 
+    JOIN Marca ma ON m.id_marca = ma.id_marca
+    WHERE v.id_sucursal = ?
+  `, [idSucursal]);
+  return rows;
+};
+
 async function marcarVehiculoEnMantenimiento(id_vehiculo) {
   const [result] = await db.execute(
     "UPDATE Vehiculo SET estado = 'Mantenimiento' WHERE id_vehiculo = ?",

@@ -2,7 +2,8 @@ const db = require('../config/db');
 const fs = require('fs');
 const path = require('path');
 const { saveImage } = require('../models/saveImage'); // Ajustá el path si está en otra carpeta
-const { getVehiclesAvailableBetweenDates } = require("../models/vehicleModels");
+const { getVehiclesAvailableBetweenDates, getVehiculosPorSucursal } = require("../models/vehicleModels");
+const { getSucursalDelEmpleado } = require('../models/userModels');
 
 
 const updateVehicle = async (req, res) => {
@@ -279,6 +280,25 @@ const getAvailableVehiclesByDate = async (req, res) => {
   }
 };
 
+const getVehiclesByEmployeeBranch = async (req, res) => {
+  try {
+    const idUsuario = req.usuario.id;
+
+    const empleado = await getSucursalDelEmpleado(idUsuario);
+
+    if (!empleado) {
+      return res.status(403).json({ mensaje: 'Empleado no encontrado o inactivo' });
+    }
+
+    const vehiculos = await getVehiculosPorSucursal(empleado.id_sucursal);
+
+    res.status(200).json(vehiculos);
+  } catch (error) {
+    console.error("❌ Error al obtener vehículos por sucursal del empleado:", error);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+};
+
 module.exports = {
   updateVehicle,
   insertVehicle,
@@ -286,4 +306,5 @@ module.exports = {
   getVehicles,
   getAvailableVehiclesByDate,
   getVehiclesAdmin,
+  getVehiclesByEmployeeBranch,
 };
