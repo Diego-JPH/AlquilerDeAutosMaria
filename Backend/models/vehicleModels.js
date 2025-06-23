@@ -55,5 +55,6 @@ async function registrarMantenimientoVehiculo(id_vehiculo, fechaInicio, diasMant
 module.exports = {
   getVehiclesAvailableBetweenDates,
   marcarVehiculoEnMantenimiento,
-  registrarMantenimientoVehiculo
+  registrarMantenimientoVehiculo,
+  getVehiculosPorSucursal
 };
