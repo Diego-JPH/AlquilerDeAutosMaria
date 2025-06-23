@@ -279,6 +279,43 @@ const getAvailableVehiclesByDate = async (req, res) => {
   }
 };
 
+const getVehiclesByEmployeeBranch = async (req, res) => {
+  try {
+    console.log("🔐 Usuario autenticado:", req.user);
+
+    const idUsuario = req.usuario.id;
+
+    const [empleadoResult] = await db.query(
+      'SELECT id_sucursal FROM Empleado WHERE id_usuario = ? AND activo = 1',
+      [idUsuario]
+    );
+
+    console.log("🧪 Resultado de Empleado:", empleadoResult);
+
+    if (!empleadoResult || empleadoResult.length === 0) {
+      console.warn("⚠️ Empleado no encontrado o inactivo:", idUsuario);
+      return res.status(403).json({ mensaje: 'Empleado no encontrado o inactivo' });
+    }
+
+    const idSucursal = empleadoResult[0].id_sucursal;
+
+    const [vehiculos] = await db.query(`
+      SELECT v.*, m.modelo AS modelo, ma.marca AS marca 
+      FROM Vehiculo v 
+      JOIN Modelo m ON v.id_modelo = m.id_modelo 
+      JOIN Marca ma ON m.id_marca = ma.id_marca
+      WHERE v.id_sucursal = ?
+    `, [idSucursal]);
+
+    console.log("🚗 Vehículos encontrados:", vehiculos.length);
+
+    res.status(200).json(vehiculos);
+  } catch (error) {
+    console.error("❌ Error al obtener vehículos por sucursal del empleado:", error);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+};
+
 module.exports = {
   updateVehicle,
   insertVehicle,
@@ -286,4 +323,5 @@ module.exports = {
   getVehicles,
   getAvailableVehiclesByDate,
   getVehiclesAdmin,
+  getVehiclesByEmployeeBranch,
 };
