@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const dayjs = require("dayjs");
 
 const getVehiclesAvailableBetweenDates = async (fechaDesde, fechaHasta) => {
   const query = `
@@ -21,7 +22,27 @@ const getVehiclesAvailableBetweenDates = async (fechaDesde, fechaHasta) => {
   return rows;
 };
 
+async function marcarVehiculoEnMantenimiento(id_vehiculo) {
+  const [result] = await db.execute(
+    "UPDATE Vehiculo SET estado = 'Mantenimiento' WHERE id_vehiculo = ?",
+    [id_vehiculo]
+  );
+  return result.affectedRows > 0;
+}
+
+async function registrarMantenimientoVehiculo(id_vehiculo, fechaInicio, diasMantenimiento) {
+  const fechaFin = dayjs(fechaInicio).add(diasMantenimiento, "day").format("YYYY-MM-DD");
+
+  const [result] = await db.execute(
+    `INSERT INTO VehiculosEnMantenimiento (id_vehiculo, fecha_inicio, fecha_fin)
+     VALUES (?, ?, ?)`,
+    [id_vehiculo, fechaInicio, fechaFin]
+  );
+  return result.insertId;
+}
 
 module.exports = {
   getVehiclesAvailableBetweenDates,
+  marcarVehiculoEnMantenimiento,
+  registrarMantenimientoVehiculo
 };

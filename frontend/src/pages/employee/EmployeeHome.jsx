@@ -1,4 +1,5 @@
 import MarkDeliveryForm from "../../components/MarkDeliveryForm";
+import RegisterReturn from "../../components/RegisterReturn";
 
 export default function EmployeeHome() {
     return (
@@ -10,8 +11,10 @@ export default function EmployeeHome() {
                 Aquí podrás gestionar la sucursal actual.
             </p>
 
-            {/* ✅ Componente para marcar entrega */}
+            {/* Componente para marcar entrega */}
             <MarkDeliveryForm />
+            {/* Componente para registrar devolución */}
+            <RegisterReturn />
         </div>
     );
 }

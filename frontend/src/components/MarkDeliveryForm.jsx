@@ -48,7 +48,7 @@ export default function MarkDeliveryForm() {
                 />
                 <button
                     type="submit"
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-700"
                 >
                     Marcar entrega
                 </button>

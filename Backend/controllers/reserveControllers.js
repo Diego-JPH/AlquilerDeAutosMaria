@@ -2,6 +2,7 @@ const dayjs = require('dayjs');
 const driverModel = require('../models/driver');
 const reserveModel = require('../models/reserve');
 const creditCardModel = require('../models/creditCardModels');
+const vehicleModel = require('../models/vehicleModels');
 const db = require('../config/db');
 
 const changeDriver = async (req, res) => {
@@ -287,6 +288,38 @@ async function marcarEntrega(req, res) {
     }
 }
 
+async function registrarDevolucion(req, res) {
+    let { idReserva, descripcion, fechaDevolucion, diasMantenimiento } = req.body;
+
+    if (!idReserva || !descripcion || !fechaDevolucion || diasMantenimiento == null) {
+        return res.status(400).json({ error: "Faltan datos obligatorios." });
+    }
+
+    try {
+        const reserva = await reserveModel.obtenerReservaPorId(idReserva);
+        if (!reserva) {
+            return res.status(404).json({ error: "Reserva no encontrada." });
+        }
+
+        if (reserva.estado === "finalizada") {
+            return res.status(400).json({ error: "La reserva ya está finalizada." });
+        }
+
+        // Actualizar reserva
+        await reserveModel.finalizarReserva(idReserva, fechaDevolucion, descripcion);
+        await reserveModel.actualizarEstadoVehiculo(idReserva, "Devuelto");
+
+        // Actualizar estado del vehículo y registrar mantenimiento
+        await vehicleModel.marcarVehiculoEnMantenimiento(reserva.id_vehiculo);
+        await vehicleModel.registrarMantenimientoVehiculo(reserva.id_vehiculo, fechaDevolucion, diasMantenimiento);
+
+        return res.status(200).json({ mensaje: "Devolución registrada correctamente." });
+    } catch (error) {
+        console.error("Error al registrar devolución:", error);
+        return res.status(500).json({ error: "Error interno del servidor." });
+    }
+}
+
 module.exports = {
     changeDriver,
     cancelReserve,
@@ -296,4 +329,5 @@ module.exports = {
     reserveVerification,
     getReservasPorSucursal,
     marcarEntrega,
+    registrarDevolucion
 };

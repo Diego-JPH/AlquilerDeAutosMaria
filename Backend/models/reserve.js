@@ -240,6 +240,26 @@ async function actualizarEstadoVehiculo(id_reserva, nuevoEstado) {
     return result.affectedRows > 0;
 }
 
+async function finalizarReserva(idReserva, fechaDevolucion, descripcion) {
+    const [result] = await db.execute(
+        `UPDATE Reserva 
+         SET estado = 'finalizada', 
+             fechaDevolucion = ?, 
+             descripcionDevolucion = ?
+         WHERE id_reserva = ?`,
+        [fechaDevolucion, descripcion, idReserva]
+    );
+    return result.affectedRows > 0;
+}
+
+async function reservaEstaActiva(idReserva) {
+    const [rows] = await db.execute(`
+        SELECT estado, id_vehiculo FROM Reserva WHERE id_reserva = ?
+    `, [idReserva]);
+
+    return rows[0]; // puede ser undefined si no existe
+}
+
 module.exports = {
     eliminarConductor,
     crearConductor,
@@ -265,4 +285,6 @@ module.exports = {
     getReservasBySucursal,
     obtenerReservaPorId,
     actualizarEstadoVehiculo,
+    finalizarReserva,
+    reservaEstaActiva
 };
