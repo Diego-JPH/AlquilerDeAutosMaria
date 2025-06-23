@@ -119,6 +119,14 @@ const actualizarSucursalEmpleado = async (id_usuario, id_sucursal) => {
   );
 };
 
+const getSucursalDelEmpleado = async (idUsuario) => {
+  const [rows] = await db.query(
+    'SELECT id_sucursal FROM Empleado WHERE id_usuario = ? AND activo = 1',
+    [idUsuario]
+  );
+  return rows[0]; // puede ser undefined
+};
+
 module.exports = {
   findUserByEmail,
   insertUser,
@@ -133,5 +141,6 @@ module.exports = {
   deleteEmpleado,
   esEmpleado,
   obtenerIdSucursalPorNombre,
-  actualizarSucursalEmpleado
+  actualizarSucursalEmpleado,
+  getSucursalDelEmpleado,
 };
