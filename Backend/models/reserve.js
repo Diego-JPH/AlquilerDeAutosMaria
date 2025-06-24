@@ -240,6 +240,18 @@ async function actualizarEstadoVehiculo(id_reserva, nuevoEstado) {
     return result.affectedRows > 0;
 }
 
+async function obtenerVehiculosAlquiladosEntreFechas(fechaInicio, fechaFin) {
+  const [rows] = await db.execute(
+    `SELECT v.id_vehiculo, v.patente, v.precioPorDia, v.estado, r.fechaDesde, r.fechaHasta
+     FROM Reserva r
+     JOIN Vehiculo v ON r.id_vehiculo = v.id_vehiculo
+     WHERE r.fechaDesde <= ? AND r.fechaHasta >= ?
+       AND r.estado <> 'cancelada'`,
+    [fechaFin, fechaInicio]
+  );
+  return rows;
+}
+
 module.exports = {
     eliminarConductor,
     crearConductor,
@@ -265,4 +277,5 @@ module.exports = {
     getReservasBySucursal,
     obtenerReservaPorId,
     actualizarEstadoVehiculo,
+    obtenerVehiculosAlquiladosEntreFechas,
 };
