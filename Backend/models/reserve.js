@@ -262,9 +262,10 @@ async function reservaEstaActiva(idReserva) {
 
 async function obtenerVehiculosAlquiladosEntreFechas(fechaInicio, fechaFin) {
   const [rows] = await db.execute(
-    `SELECT v.id_vehiculo, v.patente, v.precioPorDia, v.estado, r.fechaDesde, r.fechaHasta
+    `SELECT v.id_vehiculo, v.patente, v.precioPorDia, r.fechaDesde, r.fechaHasta, u.email
      FROM Reserva r
      JOIN Vehiculo v ON r.id_vehiculo = v.id_vehiculo
+     JOIN Usuario u ON r.id_usuario = u.id_usuario
      WHERE r.fechaDesde <= ? AND r.fechaHasta >= ?
        AND r.estado <> 'cancelada'`,
     [fechaFin, fechaInicio]

@@ -81,7 +81,7 @@ export default function getVehiclesReserved() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-4 py-2 border">Patente</th>
-                <th className="px-4 py-2 border">Estado</th>
+                <th className="px-4 py-2 border">Email cliente</th>
                 <th className="px-4 py-2 border">Precio por Día</th>
                 <th className="px-4 py-2 border">Desde</th>
                 <th className="px-4 py-2 border">Hasta</th>
@@ -91,10 +91,10 @@ export default function getVehiclesReserved() {
               {vehiculos.map((v, idx) => (
                 <tr key={idx} className="text-center border-t">
                   <td className="px-4 py-2 border">{v.patente}</td>
-                  <td className="px-4 py-2 border">{v.estado}</td>
+                  <td className="px-4 py-2 border">{v.email}</td>
                   <td className="px-4 py-2 border">${v.precioPorDia}</td>
-                  <td className="px-4 py-2 border">{v.fechaDesde}</td>
-                  <td className="px-4 py-2 border">{v.fechaHasta}</td>
+                  <td className="px-4 py-2 border">{new Date(v.fechaDesde).toISOString().slice(0, 10)}</td>
+                  <td className="px-4 py-2 border">{new Date(v.fechaHasta).toISOString().slice(0, 10)}</td>
                 </tr>
               ))}
             </tbody>
