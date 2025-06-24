@@ -1,5 +1,6 @@
 import VehicleCatalogAdmin from '../../components/VehicleCatalogAdmin';
 import AmountInPeriod from '../../components/AmountInPeriod';
+import GetVehiclesReserved from '../../components/GetVehiclesReserved';
 
 export default function AdminHome() {
   return (
@@ -8,6 +9,7 @@ export default function AdminHome() {
         Catálogo
       </h1>
       <AmountInPeriod />
+      <GetVehiclesReserved />
       <VehicleCatalogAdmin />
     </div>
   );

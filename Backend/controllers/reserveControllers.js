@@ -320,6 +320,39 @@ async function registrarDevolucion(req, res) {
     }
 }
 
+async function getVehiclesReserved(req, res) {
+  try {
+    const { fechaInicio, fechaFin } = req.query;
+
+    // Validación de fechas
+    if (!fechaInicio || !fechaFin) {
+      return res.status(400).json({ mensaje: 'Debe proporcionar ambas fechas.' });
+    }
+
+    const inicio = new Date(fechaInicio);
+    const fin = new Date(fechaFin);
+
+    if (isNaN(inicio) || isNaN(fin)) {
+      return res.status(400).json({ mensaje: 'Formato de fecha inválido.' });
+    }
+
+    if (inicio > fin) {
+      return res.status(400).json({ mensaje: 'Fecha inválida. La fecha inicial no puede ser mayor a la final.' });
+    }
+
+    const vehiculos = await reserveModel.obtenerVehiculosAlquiladosEntreFechas(fechaInicio, fechaFin);
+
+    if (vehiculos.length === 0) {
+      return res.json({ mensaje: 'No se encontraron vehículos alquilados en ese período.', vehiculos: [] });
+    }
+
+    return res.json({ vehiculos });
+  } catch (error) {
+    console.error('Error al obtener vehículos alquilados:', error);
+    res.status(500).json({ mensaje: 'Error del servidor' });
+  }
+}
+
 module.exports = {
     changeDriver,
     cancelReserve,
@@ -329,5 +362,6 @@ module.exports = {
     reserveVerification,
     getReservasPorSucursal,
     marcarEntrega,
-    registrarDevolucion
+    registrarDevolucion,
+    getVehiclesReserved
 };

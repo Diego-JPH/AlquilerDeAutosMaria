@@ -12,6 +12,7 @@ router.post('/reserveVerification', reserveController.reserveVerification);
 router.get('/get-reserve-by-sucursal', verifyToken, reserveController.getReservasPorSucursal);
 router.post("/marcar-entrega", verifyToken, reserveController.marcarEntrega);
 router.post('/devolver-vehiculo', verifyToken, reserveController.registrarDevolucion);
+router.get('/getVehiclesReserved', reserveController.getVehiclesReserved);
 console.log('Cargando rutas de reservas...');
 
 module.exports = router; //exporta el router para usarlo en otros archivos (app.js)
