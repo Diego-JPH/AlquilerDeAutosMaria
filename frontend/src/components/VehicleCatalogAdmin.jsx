@@ -46,7 +46,7 @@ export default function VehicleCatalogAdmin() {
   };
 
   const irAMetricas = () => {
-    navigate("/admin/metricas");
+    navigate("/adminMetrics");
   };
 
   const handleEliminar = async (patente) => {
