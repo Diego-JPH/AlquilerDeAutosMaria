@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -27,6 +27,7 @@ export default function CreateReserveFormEmployee() {
   });
 
   const [sucursales, setSucursales] = useState([]);
+  const [clienteNoEncontrado, setClienteNoEncontrado] = useState(false);
 
   useEffect(() => {
     const getSucursales = async () => {
@@ -69,6 +70,25 @@ export default function CreateReserveFormEmployee() {
   };
 
   const edadConductor = calcularEdad(formData.fechaN);
+
+  const handleBuscarCliente = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/user/getUserByEmail", {
+        params: { email: formData.correoCliente }
+      });
+
+      if (res.data?.id_usuario) {
+        toast.success("Cliente encontrado.");
+        setClienteNoEncontrado(false);
+      } else {
+        toast.error("Cliente no encontrado.");
+        setClienteNoEncontrado(true);
+      }
+    } catch (error) {
+      toast.error("Error al buscar el cliente.");
+      setClienteNoEncontrado(true);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -140,14 +160,34 @@ export default function CreateReserveFormEmployee() {
 
         <div className="mb-4">
           <label className="block font-medium mb-1">Correo del Cliente *</label>
-          <input
-            type="email"
-            name="correoCliente"
-            value={formData.correoCliente}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
+          <div className="flex gap-2">
+            <input
+              type="email"
+              name="correoCliente"
+              value={formData.correoCliente}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+              required
+            />
+            <button
+              type="button"
+              onClick={handleBuscarCliente}
+              className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-500"
+            >
+              Buscar
+            </button>
+          </div>
+          {clienteNoEncontrado && (
+            <div className="mt-2 text-red-600">
+              Cliente no encontrado.{" "}
+              <Link
+                to="/registrar-cliente"
+                className="text-blue-600 hover:underline"
+              >
+                Registrar Cliente
+              </Link>
+            </div>
+          )}
         </div>
 
         <div className="mb-4">
