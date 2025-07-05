@@ -25,6 +25,9 @@ import ClientRegisterListPage from "../pages/admin/ClientRegisterListPage";
 // Empleado
 import EmployeeReserve from "../pages/employee/ReservationEmployeePage";
 import RegisterClientePorEmpleadoForm from "../components/RegisterFormEmpleado";
+import EmployeeVehicleCatalogToReserve from "../components/EmployeeVehicleCatalogToReserve";
+import EmployeeCreateReserveForm from "../components/EmployeeCreateReserveForm";
+import EmployeePaymentPage from "../pages/EmployeePaymentPage";
 
 export default function AppRouter({ isLoggedIn, onLogout }) {
   return (
@@ -56,6 +59,9 @@ export default function AppRouter({ isLoggedIn, onLogout }) {
           {/* Empleado */}
           <Route path="/employeeReserve" element={<EmployeeReserve />} />
           <Route path="/registrar-cliente" element={<RegisterClientePorEmpleadoForm />} />
+          <Route path="/employee/catalog" element={<EmployeeVehicleCatalogToReserve />} />
+          <Route path="/employee/create-reserve" element={<EmployeeCreateReserveForm />} />
+          <Route path="/employee/payment" element={<EmployeePaymentPage />} />
         </Routes>
       </MainLayout>
     </Router>

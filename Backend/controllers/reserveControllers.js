@@ -93,39 +93,59 @@ const cancelReserve = async (req, res) => {
     }
 };
 const reserveVehicle = async (req, res) => {
-    const {
-        id_vehiculo,
-        fechaDesde,
-        fechaHasta,
-        sucursal_retiro_id,
-        sucursal_entrega_id,
-        nombre,
-        apellido,
-        fechaN,
-        licencia,
-        id_usuario,
-        monto,
-    } = req.body;
+  const {
+    id_vehiculo,
+    fechaDesde,
+    fechaHasta,
+    sucursal_retiro_id,
+    sucursal_entrega_id,
+    nombre,
+    apellido,
+    fechaN,
+    licencia,
+    id_usuario,
+    monto,
+  } = req.body;
 
-    try {
-        const reservaId = await reserveModel.crearReserva({
-            fechaDesde,
-            fechaHasta,
-            id_usuario,
-            id_conductor: (await driverModel.buscarId(licencia))?.id_conductor,
-            id_sucursal_retiro: sucursal_retiro_id,
-            id_sucursal_entrega: sucursal_entrega_id,
-            id_vehiculo,
-            estado: 'activa',
-            monto,
-        });
+  try {
+    // Buscar o crear conductor
+    let conductor = await driverModel.buscarId(licencia);
+    let id_conductor;
 
-        return res.status(201).json({ message: 'Reserva realizada con éxito.', reservaId });
+    if (conductor) {
+      id_conductor = conductor.id_conductor;
+    } else {
+      if (!fechaN || !dayjs(fechaN, 'YYYY-MM-DD', true).isValid()) {
+        return res.status(400).json({ error: 'La fecha de nacimiento es inválida.' });
+      }
 
-    } catch (error) {
-        console.error('Error al crear la reserva:', error);
-        return res.status(500).json({ error: 'Ocurrió un error al procesar la reserva.' });
+      const edad = dayjs().diff(dayjs(fechaN), 'year');
+      if (edad < 18) {
+        return res.status(400).json({ error: 'El conductor debe ser mayor de edad (18 años o más).' });
+      }
+
+      id_conductor = await reserveModel.crearConductor(licencia, nombre, apellido, fechaN);
     }
+
+    // Crear la reserva
+    const reservaId = await reserveModel.crearReserva({
+      fechaDesde,
+      fechaHasta,
+      id_usuario,
+      id_conductor,
+      id_sucursal_retiro: sucursal_retiro_id,
+      id_sucursal_entrega: sucursal_entrega_id,
+      id_vehiculo,
+      estado: 'activa',
+      monto,
+    });
+
+    return res.status(201).json({ message: 'Reserva realizada con éxito.', reservaId });
+
+  } catch (error) {
+    console.error('Error al crear la reserva:', error);
+    return res.status(500).json({ error: 'Ocurrió un error al procesar la reserva.' });
+  }
 };
 
 const reserveVerification = async (req, res) => {

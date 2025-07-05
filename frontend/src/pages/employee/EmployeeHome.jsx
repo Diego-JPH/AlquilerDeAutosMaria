@@ -1,17 +1,29 @@
 import MarkDeliveryForm from "../../components/MarkDeliveryForm";
+<<<<<<< HEAD
 import RegisterReturn from "../../components/RegisterReturn";
 import VehicleCatalogEmpleado from '../../components/VehicleCatalogEmpleado';
+=======
+import VehicleCatalogToReserve from "../../components/EmployeeVehicleCatalogToReserve";
+>>>>>>> feature/registrarReservaPresencial
 
 export default function EmployeeHome() {
     return (
-        <div className="max-w-7xl mx-auto px-2 mt-10">
-            <h1 className="text-4xl font-bold text-green-900 mb-6">
-                Bienvenido al sistema de gestión de empleados.
-            </h1>
-            <p className="text-lg text-gray-700 mb-4">
-                Aquí podrás gestionar la sucursal actual.
-            </p>
+        <>
+            <div className="max-w-7xl mx-auto px-2 mt-10">
+                <h1 className="text-4xl font-bold text-green-900 mb-6">
+                    Nuestro catálogo
+                </h1>
+                <VehicleCatalogToReserve />
+            </div>
+            <div className="max-w-7xl mx-auto px-2 mt-10">
+                <h1 className="text-4xl font-bold text-green-900 mb-6">
+                    Bienvenido al sistema de gestión de empleados.
+                </h1>
+                <p className="text-lg text-gray-700 mb-4">
+                    Aquí podrás gestionar la sucursal actual.
+                </p>
 
+<<<<<<< HEAD
             {/* Componente para marcar entrega */}
             <MarkDeliveryForm />
             {/* Componente para registrar devolución */}
@@ -21,5 +33,11 @@ export default function EmployeeHome() {
             </h1>
             <VehicleCatalogEmpleado />
         </div>
+=======
+                {/* ✅ Componente para marcar entrega */}
+                <MarkDeliveryForm />
+            </div>
+        </>
+>>>>>>> feature/registrarReservaPresencial
     );
 }

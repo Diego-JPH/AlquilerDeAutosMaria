@@ -15,5 +15,7 @@ router.post('/registrar-empleado', registrarEmpleado.registrarEmpleado);
 router.get('/empleados', registrarEmpleado.listarEmpleados);
 router.delete('/empleados/:id', registrarEmpleado.eliminarEmpleado);
 router.post('/registrar-cliente-por-empleado', userController.registrarClientePorEmpleado);
+router.get('/clientes', userController.listarClientes);
+router.get("/getUserByEmail", userController.getUserByEmail);
 
 module.exports = router;

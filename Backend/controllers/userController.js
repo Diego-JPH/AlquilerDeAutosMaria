@@ -7,6 +7,7 @@ const { sendVerificationEmail } = require('../utils/mailer');
 const { enviarEmailRegistroEmpleado } = require('../utils/mailer');
 const { calcularMontoEntreFechas } = require('../models/userModels');
 const { generarPasswordAleatoria } = require('../utils/randomPassword');
+const db = require('../config/db');
 
 const registrarCliente = async (req, res) => {
   const { email, nombre, apellido, contraseña, fechaN } = req.body;
@@ -185,10 +186,55 @@ const registrarClientePorEmpleado = async (req, res) => {
   return res.status(201).json({ mensaje: 'Cliente registrado correctamente y contraseña enviada por mail' });
 };
 
+const listarClientes = async (req, res) => {
+  try {
+    const [clientes] = await db.query(
+      `SELECT id_usuario, nombre, apellido, email FROM Usuario WHERE rol = 'cliente'`
+    );
+    res.status(200).json(clientes);
+  } catch (error) {
+    console.error('Error al obtener clientes:', error);
+    res.status(500).json({ error: 'Error al obtener clientes' });
+  }
+};
+
+const getUserByEmail = async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: "El correo es obligatorio." });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: "El formato del correo es inválido." });
+  }
+
+  try {
+    const result = await db.query(
+      `SELECT id_usuario, nombre, apellido, email FROM Usuario 
+       WHERE email = ? AND rol = 'cliente'`,
+      [email]
+    );
+
+    if (result[0].length === 0) {
+      return res.status(404).json({ error: "Cliente no encontrado o no tiene el rol adecuado." });
+    }
+
+    res.status(200).json(result[0][0]);
+  } catch (error) {
+    console.error("Error al buscar usuario por email:", error);
+    res.status(500).json({ error: "Error del servidor al buscar el usuario." });
+  }
+};
+
+
 module.exports = {
   registrarCliente,
   iniciarSesion,
   verificarCodigo,
   obtenerMontoRecaudado,
-  registrarClientePorEmpleado
+  registrarClientePorEmpleado,
+  listarClientes,
+  getUserByEmail
 };
