@@ -1,4 +1,5 @@
 const userModel = require('../models/userModels');
+const db = require('../config/db'); // 👈 ESTA LÍNEA FALTABA
 
 const actualizarSucursalEmpleado = async (req, res) => {
   const { email, nombre_sucursal } = req.body;
@@ -35,6 +36,28 @@ const actualizarSucursalEmpleado = async (req, res) => {
   }
 };
 
+const getClientesRegistrados = async (req, res) => {
+  const { desde, hasta } = req.query;
+
+  try {
+    if (desde && hasta && new Date(desde) > new Date(hasta)) {
+      return res.status(400).json({ mensaje: "El rango de fechas seleccionado es invalido" });
+    }
+
+    const clientes = await userModel.obtenerClientesRegistrados(desde, hasta);
+
+    if (clientes.length === 0) {
+      return res.status(200).json({ mensaje: "No hay clientes registrados", clientes: [] });
+    }
+
+    res.status(200).json({ clientes });
+  } catch (error) {
+    console.error("Error al obtener clientes:", error);
+    res.status(500).json({ mensaje: "Error al obtener clientes" });
+  }
+};
+
 module.exports = {
-  actualizarSucursalEmpleado
+  actualizarSucursalEmpleado,
+  getClientesRegistrados
 };

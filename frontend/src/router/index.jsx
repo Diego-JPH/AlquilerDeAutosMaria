@@ -20,6 +20,7 @@ import ManageVehicles from "../pages/ManageVehicles";
 import ReservationsAdminPage from "../pages/ReservationAdminPage";
 import ActualizarSucursal from "../pages/ActualizarSucursal"; // 👈 Import nuevo
 import AdminMetrics from "../pages/admin/AdminMetrics";
+import ClientRegisterListPage from "../pages/admin/ClientRegisterListPage";
 
 // Empleado
 import EmployeeReserve from "../pages/employee/ReservationEmployeePage";
@@ -50,6 +51,7 @@ export default function AppRouter({ isLoggedIn, onLogout }) {
           <Route path="/adminReserve" element={<ReservationsAdminPage />} />
           <Route path="/admin/actualizar-sucursal" element={<ActualizarSucursal />} /> 
           <Route path="/adminMetrics" element={<AdminMetrics />} />
+          <Route path="/admin/clientes-registrados" element={<ClientRegisterListPage />} />
           
           {/* Empleado */}
           <Route path="/employeeReserve" element={<EmployeeReserve />} />

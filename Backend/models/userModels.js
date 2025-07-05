@@ -127,6 +127,24 @@ const getSucursalDelEmpleado = async (idUsuario) => {
   return rows[0]; // puede ser undefined
 };
 
+async function obtenerClientesRegistrados(desde, hasta) {
+  let query = `
+    SELECT u.nombre, u.apellido, u.email, c.fecha_creacion
+    FROM Cliente c
+    JOIN Usuario u ON u.id_usuario = c.id_usuario
+  `;
+  const params = [];
+
+  if (desde && hasta) {
+    query += ` WHERE c.fecha_creacion BETWEEN ? AND ?`;
+    params.push(desde, hasta);
+  }
+
+  const [rows] = await db.query(query, params);
+  return rows;
+}
+
+
 module.exports = {
   findUserByEmail,
   insertUser,
@@ -143,4 +161,5 @@ module.exports = {
   obtenerIdSucursalPorNombre,
   actualizarSucursalEmpleado,
   getSucursalDelEmpleado,
+  obtenerClientesRegistrados,
 };
