@@ -1,10 +1,7 @@
 import MarkDeliveryForm from "../../components/MarkDeliveryForm";
-<<<<<<< HEAD
 import RegisterReturn from "../../components/RegisterReturn";
 import VehicleCatalogEmpleado from '../../components/VehicleCatalogEmpleado';
-=======
 import VehicleCatalogToReserve from "../../components/EmployeeVehicleCatalogToReserve";
->>>>>>> feature/registrarReservaPresencial
 
 export default function EmployeeHome() {
     return (
@@ -23,21 +20,15 @@ export default function EmployeeHome() {
                     Aquí podrás gestionar la sucursal actual.
                 </p>
 
-<<<<<<< HEAD
-            {/* Componente para marcar entrega */}
-            <MarkDeliveryForm />
-            {/* Componente para registrar devolución */}
-            <RegisterReturn />
-            <h1 className="text-3xl font-bold text-green-900 mb-4">
-                Vehículos de la sucursal
-            </h1>
-            <VehicleCatalogEmpleado />
-        </div>
-=======
-                {/* ✅ Componente para marcar entrega */}
+                {/* Componente para marcar entrega */}
                 <MarkDeliveryForm />
-            </div>
+                {/* Componente para registrar devolución */}
+                <RegisterReturn />
+                <h1 className="text-3xl font-bold text-green-900 mb-4">
+                    Vehículos de la sucursal
+                </h1>
+                <VehicleCatalogEmpleado />
+            </div >
         </>
->>>>>>> feature/registrarReservaPresencial
     );
 }
