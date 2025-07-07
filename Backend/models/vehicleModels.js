@@ -28,7 +28,7 @@ const getVehiculosPorSucursal = async (idSucursal) => {
     FROM Vehiculo v 
     JOIN Modelo m ON v.id_modelo = m.id_modelo 
     JOIN Marca ma ON m.id_marca = ma.id_marca
-    WHERE v.id_sucursal = ?
+    WHERE v.id_sucursal = ? and v.estado <> 'inactivo'
   `, [idSucursal]);
   return rows;
 };

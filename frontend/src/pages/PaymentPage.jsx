@@ -2,6 +2,7 @@ import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
 
 export default function PaymentPage() {
   const [params] = useSearchParams();
@@ -50,7 +51,17 @@ export default function PaymentPage() {
 
     toast.success("Reserva registrada con éxito.");
     setTimeout(() => {
-      navigate("/reserve");
+      const token = localStorage.getItem("token");
+      if (!token) return navigate("/");
+      const decoded = jwtDecode(token);
+      const rol = decoded.rol || decoded.user?.rol;
+      console.log("El rol del usuario es: " + rol);
+      
+      if (rol === "cliente") {
+        navigate("/reserve");
+      } else {
+        navigate("/"); 
+      }
     }, 2000);
   } catch (error) {
     const msg = error.response?.data?.error || "Error al registrar la reserva";
