@@ -2,18 +2,18 @@ const db = require('../config/db');
 const fs = require('fs');
 const path = require('path');
 const { saveImage } = require('../models/saveImage'); // Ajustá el path si está en otra carpeta
-const { getVehiclesAvailableBetweenDates, getVehiculosPorSucursal } = require("../models/vehicleModels");
+const { getVehiclesAvailableBetweenDates, getVehiculosPorSucursal, actualizarEstadoVehiculo } = require("../models/vehicleModels");
 const { getSucursalDelEmpleado } = require('../models/userModels');
 
 
 const updateVehicle = async (req, res) => {
   const { patente } = req.params;
-  const { precioPorDia, ultimoMantenimiento, estado , politicaDevolucion} = req.body;
+  const { precioPorDia, ultimoMantenimiento, estado, politicaDevolucion } = req.body;
 
   if ((precioPorDia === undefined || precioPorDia === '') &&
-      (ultimoMantenimiento === undefined || ultimoMantenimiento === '') &&
-      (estado === undefined || estado === '') &&
-      (politicaDevolucion === undefined || politicaDevolucion === '')) {
+    (ultimoMantenimiento === undefined || ultimoMantenimiento === '') &&
+    (estado === undefined || estado === '') &&
+    (politicaDevolucion === undefined || politicaDevolucion === '')) {
     return res.status(400).json({ error: 'Debe enviar al menos precioPorDia, ultimoMantenimiento o un estado en el body' });
   }
 
@@ -80,7 +80,6 @@ const updateVehicle = async (req, res) => {
   }
 };
 
-
 // Insertar vehículo
 const insertVehicle = async (req, res) => {
   const {
@@ -101,19 +100,19 @@ const insertVehicle = async (req, res) => {
 
 
   if (precioPorDia < 0) {
-        return res.status(400).json({
-          error: 'Precio por dia invalido. Debe ser mayor a 0',
-        });
-      }
-  
-    if (politicaDevolucion < 0 || politicaDevolucion > 100) {
-        return res.status(400).json({
-          error: 'Política de devolución inválida. Debe ser de 0 a 100',
-        });
-      }
-  
+    return res.status(400).json({
+      error: 'Precio por dia invalido. Debe ser mayor a 0',
+    });
+  }
+
+  if (politicaDevolucion < 0 || politicaDevolucion > 100) {
+    return res.status(400).json({
+      error: 'Política de devolución inválida. Debe ser de 0 a 100',
+    });
+  }
+
   const politica = parseInt(politicaDevolucion, 10);
-  
+
 
   try {
     const [existingVehicle] = await db.query('SELECT * FROM Vehiculo WHERE patente = ?', [patente]);
@@ -299,6 +298,29 @@ const getVehiclesByEmployeeBranch = async (req, res) => {
   }
 };
 
+const actualizarEstado = async (req, res) => {
+  const { patente } = req.params;
+  const { estado } = req.body;
+
+  const estadosValidos = ['disponible', 'ocupado', 'mantenimiento'];
+  if (!estado || !estadosValidos.includes(estado)) {
+    return res.status(400).json({ error: 'Estado inválido. Debe ser disponible, ocupado o mantenimiento.' });
+  }
+
+  try {
+    const actualizado = await actualizarEstadoVehiculo(patente, estado);
+
+    if (!actualizado) {
+      return res.status(404).json({ error: 'Vehículo no encontrado.' });
+    }
+
+    res.json({ mensaje: 'Estado actualizado correctamente.', patente, nuevoEstado: estado });
+  } catch (error) {
+    console.error('Error al actualizar estado del vehículo:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+};
+
 module.exports = {
   updateVehicle,
   insertVehicle,
@@ -307,4 +329,5 @@ module.exports = {
   getAvailableVehiclesByDate,
   getVehiclesAdmin,
   getVehiclesByEmployeeBranch,
+  actualizarEstado
 };

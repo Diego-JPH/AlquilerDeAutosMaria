@@ -52,9 +52,24 @@ async function registrarMantenimientoVehiculo(id_vehiculo, fechaInicio, diasMant
   return result.insertId;
 }
 
+async function actualizarEstadoVehiculo(patente, nuevoEstado) {
+  const estadosValidos = ['disponible', 'ocupado', 'mantenimiento'];
+  if (!estadosValidos.includes(nuevoEstado)) {
+    throw new Error("Estado inválido");
+  }
+
+  const [result] = await db.query(
+    "UPDATE Vehiculo SET estado = ? WHERE patente = ?",
+    [nuevoEstado, patente]
+  );
+
+  return result.affectedRows > 0;
+}
+
 module.exports = {
   getVehiclesAvailableBetweenDates,
   marcarVehiculoEnMantenimiento,
   registrarMantenimientoVehiculo,
+  actualizarEstadoVehiculo,
   getVehiculosPorSucursal
 };
