@@ -46,7 +46,7 @@ function RegisterEmployeeForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 border rounded shadow">
+    <div className="w-full max-w-md p-4 border rounded shadow bg-white">
       <h2 className="text-xl mb-4 font-bold">Registrar Empleado</h2>
 
       <form onSubmit={handleSubmit}>

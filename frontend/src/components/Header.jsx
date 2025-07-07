@@ -49,14 +49,13 @@ export default function Header({ isLoggedIn, onLogout }) {
                 <Link to="/adminReserve" className="hover:underline">Lista de reservas</Link>
                 <Link to="/manageVehicles" className="hover:underline">Administrar vehículos</Link>
                 <Link to="/registerEmployee" className="hover:underline">Administrar empleados</Link>
-                <Link to="/admin/actualizar-sucursal" className="hover:underline">Actualizar sucursal de empleado</Link>
                 <Link to="/admin/clientes-registrados" className="hover:underline">Clientes registrados</Link>
               </>
             )}
 
             {rol === 'empleado' && (
               <>
-                <Link to="/employeeReserve" className="hover:underline">Reservas</Link>
+                <Link to="/employeeReserve" className="hover:underline">Administrar reservas</Link>
                 <Link to="/registrar-cliente" className="hover:underline">Registrar Cliente</Link>
               </>
             )}

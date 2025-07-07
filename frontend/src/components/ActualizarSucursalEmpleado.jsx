@@ -56,22 +56,22 @@ export default function ActualizarSucursalEmpleado() {
   };
 
   return (
-    <div className="bg-green-900 text-white p-6 rounded shadow max-w-md mx-auto mt-6">
+    <div className="w-full max-w-md p-4 border rounded shadow bg-white">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <h2 className="text-2xl font-bold mb-4 text-center">Actualizar Sucursal del Empleado</h2>
+      <h2 className="text-xl mb-4 font-bold">Actualizar Sucursal del Empleado</h2>
 
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
         <input
           type="email"
           placeholder="Email del empleado *"
-          className="p-2 rounded text-black"
+          className="block w-full p-2 border rounded"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <select
-          className="p-2 rounded text-black"
+          className="block w-full p-2 border rounded"
           value={nombreSucursal}
           onChange={(e) => setNombreSucursal(e.target.value)}
         >
@@ -85,7 +85,7 @@ export default function ActualizarSucursalEmpleado() {
 
         <button
           type="submit"
-          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Actualizar Sucursal
         </button>
