@@ -72,11 +72,10 @@ async function obtenerSucursalPorUsuario(id_usuario) {
 
 async function getEmpleados(id_sucursal) {
   let query = `
-    SELECT u.id_usuario, u.nombre, u.apellido, u.email, s.sucursal
+    SELECT u.id_usuario, u.nombre, u.apellido, u.email, s.sucursal, e.activo
     FROM Empleado e
     JOIN Usuario u ON e.id_usuario = u.id_usuario
     JOIN Sucursal s ON e.id_sucursal = s.id_sucursal
-    WHERE e.activo = 1
   `;
   const params = [];
 
@@ -91,11 +90,17 @@ async function getEmpleados(id_sucursal) {
 
 async function deleteEmpleado(id_usuario) {
   const [result] = await db.query(
-    'UPDATE Empleado SET activo = 0 WHERE id_usuario = ?',
+    `UPDATE Empleado e
+     JOIN Usuario u ON e.id_usuario = u.id_usuario 
+     SET e.activo = 0,
+         u.email = CONCAT(u.email, '_del_', u.id_usuario)
+     WHERE e.id_usuario = ?`,
     [id_usuario]
   );
   return result;
 }
+
+
 const esEmpleado = async (id_usuario) => {
   const [rows] = await db.query(
     'SELECT * FROM Empleado WHERE id_usuario = ?',

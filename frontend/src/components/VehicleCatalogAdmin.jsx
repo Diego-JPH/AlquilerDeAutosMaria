@@ -197,12 +197,14 @@ export default function VehicleCatalogAdmin() {
                   className="bg-green-500 text-white font-bold px-4 py-2 rounded hover:bg-green-600"                >
                   Actualizar
                 </button>
-                <button
-                  onClick={() => handleEliminar(vehiculo.patente)}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                >
-                  Eliminar
-                </button>
+                {vehiculo.estado !== "inactivo" && (
+                  <button
+                    onClick={() => handleEliminar(vehiculo.patente)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    Eliminar
+                  </button>
+                )}
               </div>
             </div>
           </div>
