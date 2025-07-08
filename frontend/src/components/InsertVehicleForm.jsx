@@ -17,7 +17,7 @@ export default function InsertVehicleForm() {
 
   const [imagen, setImagen] = useState(null);
   const [sucursales, setSucursales] = useState([]);
-  const fileInputRef = useRef(null); // Referencia al input file
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchSucursales = async () => {
@@ -93,9 +93,7 @@ export default function InsertVehicleForm() {
       });
 
       setImagen(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = null; // Limpiar input de imagen
-      }
+      if (fileInputRef.current) fileInputRef.current.value = null;
     } catch (err) {
       console.error(err);
       toast.error('Error al agregar vehículo');
@@ -103,34 +101,67 @@ export default function InsertVehicleForm() {
   };
 
   return (
-    <div className="bg-green-900 text-white p-6 rounded shadow">
-      <ToastContainer position="top-right" autoClose={3000} />
+    <div className="w-full max-w-4xl p-6 border rounded shadow bg-white mx-auto mt-10">
+      <h2 className="text-xl mb-6 font-bold">Agregar Vehículo</h2>
 
-      <h2 className="text-xl font-bold mb-4">Agregar Vehículo</h2>
-
-      <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit} encType="multipart/form-data">
-        <input name="patente" placeholder="Patente *" className="p-2 rounded text-black" value={form.patente} onChange={handleChange} />
-        <input name="marca" placeholder="Marca *" className="p-2 rounded text-black" value={form.marca} onChange={handleChange} />
-        <input name="modelo" placeholder="Modelo *" className="p-2 rounded text-black" value={form.modelo} onChange={handleChange} />
-        <input name="anio" type="number" placeholder="Año *" className="p-2 rounded text-black" value={form.anio} onChange={handleChange} />
-        <input name="precioPorDia" type="number" placeholder="Precio por día *" className="p-2 rounded text-black" value={form.precioPorDia} onChange={handleChange} />
-        
+      <form
+        onSubmit={handleSubmit}
+        encType="multipart/form-data"
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+      >
+        <input
+          name="patente"
+          placeholder="Patente *"
+          className="p-2 border rounded w-full"
+          value={form.patente}
+          onChange={handleChange}
+        />
+        <input
+          name="marca"
+          placeholder="Marca *"
+          className="p-2 border rounded w-full"
+          value={form.marca}
+          onChange={handleChange}
+        />
+        <input
+          name="modelo"
+          placeholder="Modelo *"
+          className="p-2 border rounded w-full"
+          value={form.modelo}
+          onChange={handleChange}
+        />
+        <input
+          name="anio"
+          type="number"
+          placeholder="Año *"
+          className="p-2 border rounded w-full"
+          value={form.anio}
+          onChange={handleChange}
+        />
+        <input
+          name="precioPorDia"
+          type="number"
+          placeholder="Precio por día *"
+          className="p-2 border rounded w-full"
+          value={form.precioPorDia}
+          onChange={handleChange}
+        />
         <div>
-          <label className="block text-sm mb-1">Fecha de último mantenimiento *</label>
+          <label className="text-sm block mb-1">Fecha de último mantenimiento *</label>
           <input
             name="ultimoMantenimiento"
             type="date"
-            className="p-2 rounded text-black w-full"
+            className="p-2 border rounded w-full"
             value={form.ultimoMantenimiento}
             onChange={handleChange}
           />
         </div>
 
         <div>
-          <label className="block text-sm mb-1">Categoría *</label>
+          <label className="text-sm block mb-1">Categoría *</label>
           <select
             name="categoria"
-            className="p-2 rounded text-black w-full"
+            className="p-2 border rounded w-full"
             value={form.categoria}
             onChange={handleChange}
           >
@@ -143,53 +174,58 @@ export default function InsertVehicleForm() {
         </div>
 
         <div>
-          <label className="block text-sm mb-1">Sucursal *</label>
+          <label className="text-sm block mb-1">Sucursal *</label>
           <select
             name="sucursal"
-            className="p-2 rounded text-black w-full"
+            className="p-2 border rounded w-full"
             value={form.sucursal}
             onChange={handleChange}
           >
             <option value="">Seleccionar sucursal</option>
-            {sucursales.map((sucursal) => (
-              <option key={sucursal.id_sucursal} value={sucursal.sucursal}>
-                {sucursal.sucursal}
+            {sucursales.map((s) => (
+              <option key={s.id_sucursal} value={s.sucursal}>
+                {s.sucursal}
               </option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-sm mb-1">Política de devolución (%) *</label>
+          <label className="text-sm block mb-1">Política de devolución (%) *</label>
           <input
             name="politicaDevolucion"
             type="number"
             placeholder="Ej: 100, 50, 0"
-            className="p-2 rounded text-black w-full"
+            className="p-2 border rounded w-full"
             value={form.politicaDevolucion}
             onChange={handleChange}
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm mb-1">Imagen del vehículo (opcional)</label>
+          <label className="text-sm block mb-1">Imagen del vehículo (opcional)</label>
           <input
             type="file"
             accept="image/*"
             onChange={handleImageChange}
             ref={fileInputRef}
-            className="p-2 rounded text-white w-full"
+            className="p-2 border rounded w-full"
           />
         </div>
 
-        <div className="md:col-span-2">
-          <button type="submit" className="bg-green-500 text-white font-bold px-4 py-2 rounded hover:bg-green-600">
+        <div className="md:col-span-2 flex justify-end">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white font-bold px-4 py-2 rounded hover:bg-blue-700"
+          >
             Agregar Vehículo
           </button>
         </div>
       </form>
 
-      <p className="text-sm mt-4">* Campos obligatorios</p>
+      <p className="text-sm mt-4 text-gray-600">* Campos obligatorios</p>
+
+      <ToastContainer />
     </div>
   );
 }

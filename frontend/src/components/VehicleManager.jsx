@@ -9,12 +9,6 @@ export default function VehicleManager() {
       <div>
         <InsertVehicleForm />
       </div>
-
-      {/* Filas con formularios de actualizar y eliminar (mitad y mitad) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <UpdateVehicleForm />
-        <DeleteVehicleForm />
-      </div>
     </div>
   );
 }
