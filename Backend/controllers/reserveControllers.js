@@ -93,59 +93,59 @@ const cancelReserve = async (req, res) => {
     }
 };
 const reserveVehicle = async (req, res) => {
-  const {
-    id_vehiculo,
-    fechaDesde,
-    fechaHasta,
-    sucursal_retiro_id,
-    sucursal_entrega_id,
-    nombre,
-    apellido,
-    fechaN,
-    licencia,
-    id_usuario,
-    monto,
-  } = req.body;
+    const {
+        id_vehiculo,
+        fechaDesde,
+        fechaHasta,
+        sucursal_retiro_id,
+        sucursal_entrega_id,
+        nombre,
+        apellido,
+        fechaN,
+        licencia,
+        id_usuario,
+        monto,
+    } = req.body;
 
-  try {
-    // Buscar o crear conductor
-    let conductor = await driverModel.buscarId(licencia);
-    let id_conductor;
+    try {
+        // Buscar o crear conductor
+        let conductor = await driverModel.buscarId(licencia);
+        let id_conductor;
 
-    if (conductor) {
-      id_conductor = conductor.id_conductor;
-    } else {
-      if (!fechaN || !dayjs(fechaN, 'YYYY-MM-DD', true).isValid()) {
-        return res.status(400).json({ error: 'La fecha de nacimiento es inválida.' });
-      }
+        if (conductor) {
+            id_conductor = conductor.id_conductor;
+        } else {
+            if (!fechaN || !dayjs(fechaN, 'YYYY-MM-DD', true).isValid()) {
+                return res.status(400).json({ error: 'La fecha de nacimiento es inválida.' });
+            }
 
-      const edad = dayjs().diff(dayjs(fechaN), 'year');
-      if (edad < 18) {
-        return res.status(400).json({ error: 'El conductor debe ser mayor de edad (18 años o más).' });
-      }
+            const edad = dayjs().diff(dayjs(fechaN), 'year');
+            if (edad < 18) {
+                return res.status(400).json({ error: 'El conductor debe ser mayor de edad (18 años o más).' });
+            }
 
-      id_conductor = await reserveModel.crearConductor(licencia, nombre, apellido, fechaN);
+            id_conductor = await reserveModel.crearConductor(licencia, nombre, apellido, fechaN);
+        }
+
+        // Crear la reserva
+        const reservaId = await reserveModel.crearReserva({
+            fechaDesde,
+            fechaHasta,
+            id_usuario,
+            id_conductor,
+            id_sucursal_retiro: sucursal_retiro_id,
+            id_sucursal_entrega: sucursal_entrega_id,
+            id_vehiculo,
+            estado: 'activa',
+            monto,
+        });
+
+        return res.status(201).json({ message: 'Reserva realizada con éxito.', reservaId });
+
+    } catch (error) {
+        console.error('Error al crear la reserva:', error);
+        return res.status(500).json({ error: 'Ocurrió un error al procesar la reserva.' });
     }
-
-    // Crear la reserva
-    const reservaId = await reserveModel.crearReserva({
-      fechaDesde,
-      fechaHasta,
-      id_usuario,
-      id_conductor,
-      id_sucursal_retiro: sucursal_retiro_id,
-      id_sucursal_entrega: sucursal_entrega_id,
-      id_vehiculo,
-      estado: 'activa',
-      monto,
-    });
-
-    return res.status(201).json({ message: 'Reserva realizada con éxito.', reservaId });
-
-  } catch (error) {
-    console.error('Error al crear la reserva:', error);
-    return res.status(500).json({ error: 'Ocurrió un error al procesar la reserva.' });
-  }
 };
 
 const reserveVerification = async (req, res) => {
@@ -274,9 +274,9 @@ const getReservasPorSucursal = async (req, res) => {
     }
 };
 
-async function marcarEntrega(req, res) {
-    const { idReserva } = req.body;
-    const idSucursal = req.sucursal?.id_sucursal;
+const marcarEntrega = async (req, res) => {
+    const { idReserva, idNuevoVehiculo } = req.body;
+    const idSucursal = req.usuario?.sucursal?.id_sucursal;
 
     if (!idReserva) {
         return res.status(400).json({ error: "ID de reserva es obligatorio." });
@@ -284,29 +284,68 @@ async function marcarEntrega(req, res) {
 
     try {
         const reserva = await reserveModel.obtenerReservaPorId(idReserva);
-
         if (!reserva) {
             return res.status(404).json({ error: "Reserva no encontrada." });
         }
 
-        if (reserva.id_sucursal !== idSucursal) {
-            return res
-                .status(403)
-                .json({ error: "No tienes acceso a esta reserva." });
+        if (reserva.id_sucursal_retiro !== idSucursal) {
+            return res.status(403).json({ error: "No tienes acceso a esta reserva." });
         }
 
-        const actualizado = await reserveModel.actualizarEstadoVehiculo(idReserva, "Entregado");
-
-        if (!actualizado) {
-            return res.status(500).json({ error: "No se pudo actualizar el estado." });
+        const vehiculo = await reserveModel.obtenerVehiculoPorId(reserva.id_vehiculo);
+        if (!vehiculo) {
+            return res.status(404).json({ error: "Vehículo original no encontrado." });
         }
 
-        res.json({ mensaje: "Vehículo marcado como entregado." });
+        const estadosNoDisponibles = ['mantenimiento', 'ocupado'];
+        if (estadosNoDisponibles.includes(vehiculo.estado.toLowerCase())) {
+            if (!idNuevoVehiculo) {
+                // Buscar y devolver autos alternativos sin modificar la reserva aún
+                const alternativas = await reserveModel.obtenerVehiculosAlternativos(
+                    vehiculo.precioPorDia,
+                    vehiculo.id_sucursal
+                );
+                if (alternativas.length > 0) {
+                    return res.status(200).json({
+                        necesitaAlternativa: true,
+                        mensaje: "El vehículo original no está disponible. Elija un vehículo alternativo.",
+                        alternativas
+                    });
+                } else {
+                    return res.status(200).json({
+                        necesitaAlternativa: false,
+                        mensaje: "No hay vehículos alternativos disponibles en esta sucursal."
+                    });
+                }
+            } else {
+                // Si se elige uno, actualizamos la reserva
+                const actualizado = await reserveModel.actualizarVehiculoEnReserva(idReserva, idNuevoVehiculo);
+                if (!actualizado) {
+                    return res.status(500).json({ error: "No se pudo actualizar la reserva con el nuevo vehículo." });
+                }
+
+                const marcado = await reserveModel.actualizarEstadoVehiculo(idReserva, "Entregado");
+                if (!marcado) {
+                    return res.status(500).json({ error: "No se pudo actualizar el estado de la reserva." });
+                }
+
+                return res.status(200).json({ mensaje: "Reserva actualizada con vehículo alternativo y marcada como entregada." });
+            }
+        }
+
+        // Si el vehículo original está disponible, solo marcamos como entregado
+        const marcado = await reserveModel.actualizarEstadoVehiculo(idReserva, "Entregado");
+        if (!marcado) {
+            return res.status(500).json({ error: "No se pudo actualizar el estado de la reserva." });
+        }
+
+        return res.status(200).json({ mensaje: "Vehículo marcado como entregado." });
+
     } catch (error) {
         console.error("Error al marcar entrega:", error);
         res.status(500).json({ error: "Error interno del servidor." });
     }
-}
+};
 
 async function registrarDevolucion(req, res) {
     let { idReserva, descripcion, fechaDevolucion, diasMantenimiento } = req.body;
@@ -341,36 +380,36 @@ async function registrarDevolucion(req, res) {
 }
 
 async function getVehiclesReserved(req, res) {
-  try {
-    const { fechaInicio, fechaFin } = req.query;
+    try {
+        const { fechaInicio, fechaFin } = req.query;
 
-    // Validación de fechas
-    if (!fechaInicio || !fechaFin) {
-      return res.status(400).json({ mensaje: 'Debe proporcionar ambas fechas.' });
+        // Validación de fechas
+        if (!fechaInicio || !fechaFin) {
+            return res.status(400).json({ mensaje: 'Debe proporcionar ambas fechas.' });
+        }
+
+        const inicio = new Date(fechaInicio);
+        const fin = new Date(fechaFin);
+
+        if (isNaN(inicio) || isNaN(fin)) {
+            return res.status(400).json({ mensaje: 'Formato de fecha inválido.' });
+        }
+
+        if (inicio > fin) {
+            return res.status(400).json({ mensaje: 'Fecha inválida. La fecha inicial no puede ser mayor a la final.' });
+        }
+
+        const vehiculos = await reserveModel.obtenerVehiculosAlquiladosEntreFechas(fechaInicio, fechaFin);
+
+        if (vehiculos.length === 0) {
+            return res.json({ mensaje: 'No se encontraron vehículos alquilados en ese período.', vehiculos: [] });
+        }
+
+        return res.json({ vehiculos });
+    } catch (error) {
+        console.error('Error al obtener vehículos alquilados:', error);
+        res.status(500).json({ mensaje: 'Error del servidor' });
     }
-
-    const inicio = new Date(fechaInicio);
-    const fin = new Date(fechaFin);
-
-    if (isNaN(inicio) || isNaN(fin)) {
-      return res.status(400).json({ mensaje: 'Formato de fecha inválido.' });
-    }
-
-    if (inicio > fin) {
-      return res.status(400).json({ mensaje: 'Fecha inválida. La fecha inicial no puede ser mayor a la final.' });
-    }
-
-    const vehiculos = await reserveModel.obtenerVehiculosAlquiladosEntreFechas(fechaInicio, fechaFin);
-
-    if (vehiculos.length === 0) {
-      return res.json({ mensaje: 'No se encontraron vehículos alquilados en ese período.', vehiculos: [] });
-    }
-
-    return res.json({ vehiculos });
-  } catch (error) {
-    console.error('Error al obtener vehículos alquilados:', error);
-    res.status(500).json({ mensaje: 'Error del servidor' });
-  }
 }
 
 module.exports = {

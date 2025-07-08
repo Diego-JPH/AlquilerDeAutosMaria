@@ -229,7 +229,7 @@ async function obtenerReservaPorId(id_reserva) {
         "SELECT * FROM Reserva WHERE id_reserva = ?",
         [id_reserva]
     );
-    return rows[0];
+    return rows[0] || null;
 }
 
 async function actualizarEstadoVehiculo(id_reserva, nuevoEstado) {
@@ -261,17 +261,51 @@ async function reservaEstaActiva(idReserva) {
 }
 
 async function obtenerVehiculosAlquiladosEntreFechas(fechaInicio, fechaFin) {
-  const [rows] = await db.execute(
-    `SELECT v.id_vehiculo, v.patente, v.precioPorDia, r.fechaDesde, r.fechaHasta, u.email
+    const [rows] = await db.execute(
+        `SELECT v.id_vehiculo, v.patente, v.precioPorDia, r.fechaDesde, r.fechaHasta, u.email
      FROM Reserva r
      JOIN Vehiculo v ON r.id_vehiculo = v.id_vehiculo
      JOIN Usuario u ON r.id_usuario = u.id_usuario
      WHERE r.fechaDesde <= ? AND r.fechaHasta >= ?
        AND r.estado <> 'cancelada'`,
-    [fechaFin, fechaInicio]
-  );
-  return rows;
+        [fechaFin, fechaInicio]
+    );
+    return rows;
 }
+
+const obtenerVehiculoPorId = async (idVehiculo) => {
+    const [rows] = await db.query('SELECT * FROM Vehiculo WHERE id_vehiculo = ?', [idVehiculo]);
+    return rows[0] || null;
+};
+
+const obtenerVehiculosAlternativos = async (precio, idSucursal) => {
+    const [rows] = await db.query(
+        `SELECT 
+            v.id_vehiculo,
+            v.patente,
+            v.precioPorDia,
+            v.estado,
+            m.modelo,
+            ma.marca
+         FROM Vehiculo v
+         JOIN Modelo m ON v.id_modelo = m.id_modelo
+         JOIN Marca ma ON m.id_marca = ma.id_marca
+         WHERE 
+            v.precioPorDia >= ? 
+            AND v.id_sucursal = ? 
+            AND v.estado = 'disponible'`,
+        [precio, idSucursal]
+    );
+    return rows;
+};
+
+const actualizarVehiculoEnReserva = async (idReserva, idNuevoVehiculo) => {
+    const [result] = await db.execute(
+        "UPDATE Reserva SET id_vehiculo = ? WHERE id_reserva = ?",
+        [idNuevoVehiculo, idReserva]
+    );
+    return result.affectedRows > 0;
+};
 
 module.exports = {
     eliminarConductor,
@@ -300,5 +334,8 @@ module.exports = {
     actualizarEstadoVehiculo,
     finalizarReserva,
     reservaEstaActiva,
-    obtenerVehiculosAlquiladosEntreFechas
+    obtenerVehiculosAlquiladosEntreFechas,
+    obtenerVehiculoPorId,
+    obtenerVehiculosAlternativos,
+    actualizarVehiculoEnReserva
 };
