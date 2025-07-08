@@ -5,6 +5,8 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/es";
+import MarkDeliveryForm from "./MarkDeliveryForm";
+import RegisterReturn from "./RegisterReturn";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -13,6 +15,8 @@ dayjs.locale("es");
 export default function ReservasPorSucursal() {
     const [reservas, setReservas] = useState([]);
     const [error, setError] = useState("");
+    const [mostrarEntrega, setMostrarEntrega] = useState(null);
+    const [mostrarDevolucion, setMostrarDevolucion] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -34,7 +38,6 @@ export default function ReservasPorSucursal() {
                         },
                     }
                 );
-                console.log("Reservas recibidas:", response.data); // <-- DEBUG
                 setReservas(response.data);
             } catch (err) {
                 console.error("Error al obtener reservas:", err);
@@ -47,12 +50,9 @@ export default function ReservasPorSucursal() {
         fetchReservas();
     }, [navigate]);
 
-    // Nueva función para formatear fechas evitando el desfase de un día
     const formatearFecha = (fechaISO) => {
         if (!fechaISO) return "Fecha inválida";
-        // Quitar "Z" final para evitar conversión UTC automática y luego parsear en zona local de Argentina
         const fechaSinZ = fechaISO.endsWith("Z") ? fechaISO.slice(0, -1) : fechaISO;
-        // Convertimos usando timezone de Argentina ("America/Argentina/Buenos_Aires")
         return dayjs.tz(fechaSinZ, "America/Argentina/Buenos_Aires").format("DD/MM/YYYY");
     };
 
@@ -66,23 +66,80 @@ export default function ReservasPorSucursal() {
                 <p>No hay reservas registradas para esta sucursal.</p>
             ) : (
                 <ul className="space-y-4">
-                    {reservas.map((reserva) => (
-                        <li
-                            key={reserva.id_reserva}
-                            className="border rounded p-4 shadow-sm bg-white"
-                        >
-                            <p><strong>ID Reserva:</strong> {reserva.id_reserva}</p>
-                            <p><strong>Cliente:</strong> {reserva.nombre} {reserva.apellido}</p>
-                            <p><strong>Vehículo:</strong> {reserva.marca} {reserva.modelo}</p>
-                            <p>
-                                <strong>Fecha:</strong>{" "}
-                                {formatearFecha(reserva.fechaDesde)} a{" "}
-                                {formatearFecha(reserva.fechaHasta)}
-                            </p>
-                            <p><strong>Estado:</strong> {reserva.estado}</p>
-                            <p><strong>Monto:</strong> ${reserva.monto}</p>
-                        </li>
-                    ))}
+                    {reservas.map((reserva) => {
+                        const entregaDisabled =
+                            reserva.estadoVehiculo === "Entregado" ||
+                            reserva.estadoVehiculo === "Devuelto";
+
+                        const devolucionDisabled =
+                            reserva.estadoVehiculo === "Devuelto" ||
+                            reserva.estado === "Finalizada";
+
+                        return (
+                            <li
+                                key={reserva.id_reserva}
+                                className="border rounded p-4 shadow-sm bg-white"
+                            >
+                                <p><strong>ID Reserva:</strong> {reserva.id_reserva}</p>
+                                <p><strong>Cliente:</strong> {reserva.nombre} {reserva.apellido}</p>
+                                <p><strong>Vehículo:</strong> {reserva.marca} {reserva.modelo}</p>
+                                <p>
+                                    <strong>Fecha:</strong>{" "}
+                                    {formatearFecha(reserva.fechaDesde)} a{" "}
+                                    {formatearFecha(reserva.fechaHasta)}
+                                </p>
+                                <p><strong>Estado:</strong> {reserva.estado}</p>
+                                <p><strong>Estado Vehículo:</strong> {reserva.estadoVehiculo}</p>
+                                <p><strong>Monto:</strong> ${reserva.monto}</p>
+
+                                <div className="mt-3 flex gap-3">
+                                    <button
+                                        onClick={() => setMostrarEntrega(reserva.id_reserva)}
+                                        disabled={entregaDisabled}
+                                        title={
+                                            entregaDisabled
+                                                ? "Ya fue entregado o devuelto"
+                                                : "Marcar entrega"
+                                        }
+                                        className={`px-3 py-1 rounded text-white transition 
+                                            ${entregaDisabled
+                                                ? "bg-gray-400 cursor-not-allowed"
+                                                : "bg-green-600 hover:bg-green-700"}`}
+                                    >
+                                        Marcar entrega
+                                    </button>
+
+                                    <button
+                                        onClick={() => setMostrarDevolucion(reserva.id_reserva)}
+                                        disabled={devolucionDisabled}
+                                        title={
+                                            devolucionDisabled
+                                                ? "Ya fue devuelto o finalizado"
+                                                : "Marcar devolución"
+                                        }
+                                        className={`px-3 py-1 rounded text-white transition 
+                                            ${devolucionDisabled
+                                                ? "bg-gray-400 cursor-not-allowed"
+                                                : "bg-blue-600 hover:bg-blue-700"}`}
+                                    >
+                                        Marcar devolución
+                                    </button>
+                                </div>
+
+                                {mostrarEntrega === reserva.id_reserva && (
+                                    <div className="mt-4">
+                                        <MarkDeliveryForm idReserva={reserva.id_reserva} />
+                                    </div>
+                                )}
+
+                                {mostrarDevolucion === reserva.id_reserva && (
+                                    <div className="mt-4">
+                                        <RegisterReturn idReserva={reserva.id_reserva} />
+                                    </div>
+                                )}
+                            </li>
+                        );
+                    })}
                 </ul>
             )}
         </div>

@@ -1,8 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
-export default function MarkDeliveryForm() {
-    const [idReserva, setIdReserva] = useState("");
+export default function MarkDeliveryForm({ idReserva }) {
     const [mensaje, setMensaje] = useState("");
     const [error, setError] = useState("");
     const [alternativas, setAlternativas] = useState([]);
@@ -15,11 +14,6 @@ export default function MarkDeliveryForm() {
         setError("");
         setAlternativas([]);
 
-        if (!idReserva) {
-            setError("Debes ingresar un ID de reserva.");
-            return;
-        }
-
         try {
             const res = await axios.post(
                 "http://localhost:3000/api/reserve/marcar-entrega",
@@ -31,13 +25,11 @@ export default function MarkDeliveryForm() {
                 }
             );
 
-            // Si vienen alternativas, mostrar opciones
             if (res.data.alternativas && res.data.alternativas.length > 0) {
                 setAlternativas(res.data.alternativas);
                 setMensaje(res.data.mensaje);
             } else {
                 setMensaje(res.data.mensaje);
-                setIdReserva("");
             }
         } catch (err) {
             setError(err.response?.data?.error || "Error al marcar entrega.");
@@ -47,11 +39,8 @@ export default function MarkDeliveryForm() {
     const handleCambiarVehiculo = async (idNuevoVehiculo) => {
         try {
             const res = await axios.post(
-                `http://localhost:3000/api/reserve/marcar-entrega`,
-                {
-                    idReserva,
-                    idNuevoVehiculo,
-                },
+                "http://localhost:3000/api/reserve/marcar-entrega",
+                { idReserva, idNuevoVehiculo },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -61,7 +50,6 @@ export default function MarkDeliveryForm() {
 
             setMensaje(res.data.mensaje);
             setAlternativas([]);
-            setIdReserva("");
         } catch (err) {
             setError(
                 err.response?.data?.error ||
@@ -75,14 +63,9 @@ export default function MarkDeliveryForm() {
             <h2 className="text-xl font-semibold mb-2 text-green-800">
                 Marcar Entrega de Reserva
             </h2>
+
             <form onSubmit={handleSubmit} className="mb-4">
-                <label className="block mb-2">ID de Reserva:</label>
-                <input
-                    type="number"
-                    value={idReserva}
-                    onChange={(e) => setIdReserva(e.target.value)}
-                    className="border px-2 py-1 rounded w-full mb-4"
-                />
+                <p className="mb-2"><strong>ID de Reserva:</strong> {idReserva}</p>
                 <button
                     type="submit"
                     className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800"

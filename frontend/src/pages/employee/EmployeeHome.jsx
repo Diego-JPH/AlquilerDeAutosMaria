@@ -18,10 +18,6 @@ export default function EmployeeHome() {
                     Vehículos de la sucursal
                 </h1>
                 <EmployeeVehicleManager />
-                {/* Componente para marcar entrega */}
-                <MarkDeliveryForm />
-                {/* Componente para registrar devolución */}
-                <RegisterReturn />
             </div >
         </>
     );

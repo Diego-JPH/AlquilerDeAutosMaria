@@ -1,9 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
-export default function RegisterReturn() {
+export default function RegisterReturn({ idReserva }) {
     const [formData, setFormData] = useState({
-        idReserva: "",
         fechaDevolucion: "",
         descripcion: "",
         diasMantenimiento: "",
@@ -31,7 +30,7 @@ export default function RegisterReturn() {
         try {
             const response = await axios.post(
                 "http://localhost:3000/api/reserve/devolver-vehiculo",
-                formData,
+                { ...formData, idReserva },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -40,7 +39,6 @@ export default function RegisterReturn() {
             );
             setMensaje(response.data.mensaje);
             setFormData({
-                idReserva: "",
                 fechaDevolucion: "",
                 descripcion: "",
                 diasMantenimiento: "",
@@ -54,17 +52,7 @@ export default function RegisterReturn() {
         <div className="bg-white p-6 rounded shadow-md mt-8 w-full">
             <h2 className="text-xl font-semibold text-green-900 mb-4">Registrar devolución de vehículo</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="block text-gray-700">ID Reserva:</label>
-                    <input
-                        type="number"
-                        name="idReserva"
-                        value={formData.idReserva}
-                        onChange={handleChange}
-                        className="w-full p-2 border rounded"
-                        required
-                    />
-                </div>
+                <p><strong>ID Reserva:</strong> {idReserva}</p>
                 <div>
                     <label className="block text-gray-700">Fecha de devolución:</label>
                     <input
