@@ -38,6 +38,7 @@ export default function ReservasPorSucursal() {
                         },
                     }
                 );
+                console.log("Reservas desde backend:", response.data); // 👈 Agregado
                 setReservas(response.data);
             } catch (err) {
                 console.error("Error al obtener reservas:", err);
@@ -69,11 +70,13 @@ export default function ReservasPorSucursal() {
                     {reservas.map((reserva) => {
                         const entregaDisabled =
                             reserva.estadoVehiculo === "Entregado" ||
-                            reserva.estadoVehiculo === "Devuelto";
+                            reserva.estadoVehiculo === "Devuelto" ||
+                            reserva.estado === "Finalizada";
 
                         const devolucionDisabled =
                             reserva.estadoVehiculo === "Devuelto" ||
-                            reserva.estado === "Finalizada";
+                            reserva.estado === "Finalizada" ||
+                            reserva.estadoVehiculo === "Esperando";
 
                         return (
                             <li

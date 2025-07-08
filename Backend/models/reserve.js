@@ -207,6 +207,7 @@ const getReservasBySucursal = async (idSucursal) => {
             r.fechaDesde,
             r.fechaHasta,
             r.estado,
+            r.estadoVehiculo,
             r.monto,
             u.nombre,
             u.apellido,
