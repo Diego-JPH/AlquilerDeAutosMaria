@@ -17,6 +17,7 @@ export default function ReservasPorSucursal() {
     const [error, setError] = useState("");
     const [mostrarEntrega, setMostrarEntrega] = useState(null);
     const [mostrarDevolucion, setMostrarDevolucion] = useState(null);
+    const [fechaSeleccionada, setFechaSeleccionada] = useState(dayjs().format("YYYY-MM-DD"));
     const navigate = useNavigate();
 
     const fetchReservas = async () => {
@@ -52,9 +53,14 @@ export default function ReservasPorSucursal() {
 
     const formatearFecha = (fechaISO) => {
         if (!fechaISO) return "Fecha inválida";
-        const fechaSinZ = fechaISO.endsWith("Z") ? fechaISO.slice(0, -1) : fechaISO;
-        return dayjs.tz(fechaSinZ, "America/Argentina/Buenos_Aires").format("DD/MM/YYYY");
+        return dayjs.utc(fechaISO).format("DD/MM/YYYY");
     };
+
+    const reservasFiltradas = reservas.filter((reserva) => {
+        const fechaDesde = dayjs.utc(reserva.fechaDesde).format("YYYY-MM-DD");
+        const fechaHasta = dayjs.utc(reserva.fechaHasta).format("YYYY-MM-DD");
+        return fechaDesde === fechaSeleccionada || fechaHasta === fechaSeleccionada;
+    });
 
     if (error) return <p className="text-red-500">{error}</p>;
 
@@ -62,11 +68,21 @@ export default function ReservasPorSucursal() {
         <div className="p-6">
             <h2 className="text-2xl font-semibold mb-4">Reservas por Sucursal</h2>
 
-            {reservas.length === 0 ? (
-                <p>No hay reservas registradas para esta sucursal.</p>
+            <div className="mb-4">
+                <label className="block text-gray-700 mb-1">Filtrar por fecha:</label>
+                <input
+                    type="date"
+                    value={fechaSeleccionada}
+                    onChange={(e) => setFechaSeleccionada(e.target.value)}
+                    className="border rounded p-2"
+                />
+            </div>
+
+            {reservasFiltradas.length === 0 ? (
+                <p>No hay reservas registradas para esta fecha.</p>
             ) : (
                 <ul className="space-y-4">
-                    {reservas.map((reserva) => {
+                    {reservasFiltradas.map((reserva) => {
                         const entregaDisabled =
                             reserva.estadoVehiculo === "Entregado" ||
                             reserva.estadoVehiculo === "Devuelto" ||
