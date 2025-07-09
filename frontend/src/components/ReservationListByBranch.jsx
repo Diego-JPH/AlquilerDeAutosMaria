@@ -19,35 +19,34 @@ export default function ReservasPorSucursal() {
     const [mostrarDevolucion, setMostrarDevolucion] = useState(null);
     const navigate = useNavigate();
 
+    const fetchReservas = async () => {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            setError("No se encontró el token de autenticación.");
+            navigate("/login");
+            return;
+        }
+
+        try {
+            const response = await axios.get(
+                "http://localhost:3000/api/reserve/get-reserve-by-sucursal",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            setReservas(response.data);
+        } catch (err) {
+            console.error("Error al obtener reservas:", err);
+            setError(
+                err.response?.data?.error || "Error al obtener reservas."
+            );
+        }
+    };
+
     useEffect(() => {
-        const fetchReservas = async () => {
-            const token = localStorage.getItem("token");
-
-            if (!token) {
-                setError("No se encontró el token de autenticación.");
-                navigate("/login");
-                return;
-            }
-
-            try {
-                const response = await axios.get(
-                    "http://localhost:3000/api/reserve/get-reserve-by-sucursal",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                console.log("Reservas desde backend:", response.data); // 👈 Agregado
-                setReservas(response.data);
-            } catch (err) {
-                console.error("Error al obtener reservas:", err);
-                setError(
-                    err.response?.data?.error || "Error al obtener reservas."
-                );
-            }
-        };
-
         fetchReservas();
     }, [navigate]);
 
@@ -131,13 +130,19 @@ export default function ReservasPorSucursal() {
 
                                 {mostrarEntrega === reserva.id_reserva && (
                                     <div className="mt-4">
-                                        <MarkDeliveryForm idReserva={reserva.id_reserva} />
+                                        <MarkDeliveryForm
+                                            idReserva={reserva.id_reserva}
+                                            onSuccess={fetchReservas}
+                                        />
                                     </div>
                                 )}
 
                                 {mostrarDevolucion === reserva.id_reserva && (
                                     <div className="mt-4">
-                                        <RegisterReturn idReserva={reserva.id_reserva} />
+                                        <RegisterReturn
+                                            idReserva={reserva.id_reserva}
+                                            onSuccess={fetchReservas}
+                                        />
                                     </div>
                                 )}
                             </li>

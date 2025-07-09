@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-export default function RegisterReturn({ idReserva }) {
+export default function RegisterReturn({ idReserva, onSuccess }) {
     const [formData, setFormData] = useState({
         fechaDevolucion: "",
         descripcion: "",
@@ -27,15 +27,16 @@ export default function RegisterReturn({ idReserva }) {
             return;
         }
 
+        if (parseInt(formData.diasMantenimiento) < 1) {
+            setError("Los días de mantenimiento deben ser al menos 1.");
+            return;
+        }
+
         try {
             const response = await axios.post(
                 "http://localhost:3000/api/reserve/devolver-vehiculo",
                 { ...formData, idReserva },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
             setMensaje(response.data.mensaje);
             setFormData({
@@ -43,6 +44,9 @@ export default function RegisterReturn({ idReserva }) {
                 descripcion: "",
                 diasMantenimiento: "",
             });
+
+            if (onSuccess) onSuccess(); // ✅ Refrescar reservas
+
         } catch (err) {
             setError(err.response?.data?.error || "Error al registrar la devolución.");
         }
@@ -83,7 +87,7 @@ export default function RegisterReturn({ idReserva }) {
                         onChange={handleChange}
                         className="w-full p-2 border rounded"
                         required
-                        min="0"
+                        min="1"
                     />
                 </div>
                 <button

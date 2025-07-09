@@ -66,10 +66,19 @@ async function actualizarEstadoVehiculo(patente, nuevoEstado) {
   return result.affectedRows > 0;
 }
 
+const cambiarEstadoVehiculo = async (idVehiculo, nuevoEstado) => {
+  const [result] = await db.query(
+    `UPDATE Vehiculo SET estado = ? WHERE id_vehiculo = ?`,
+    [nuevoEstado, idVehiculo]
+  );
+  return result.affectedRows > 0;
+};
+
 module.exports = {
   getVehiclesAvailableBetweenDates,
   marcarVehiculoEnMantenimiento,
   registrarMantenimientoVehiculo,
   actualizarEstadoVehiculo,
-  getVehiculosPorSucursal
+  getVehiculosPorSucursal,
+  cambiarEstadoVehiculo
 };

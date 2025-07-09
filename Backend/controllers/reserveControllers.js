@@ -329,6 +329,12 @@ const marcarEntrega = async (req, res) => {
                     return res.status(500).json({ error: "No se pudo actualizar el estado de la reserva." });
                 }
 
+                // Cambiar el estado del nuevo vehículo a "ocupado"
+                const vehiculoOcupado = await vehicleModel.cambiarEstadoVehiculo(idNuevoVehiculo, "ocupado");
+                if (!vehiculoOcupado) {
+                    return res.status(500).json({ error: "No se pudo actualizar el estado del vehículo." });
+                }
+
                 return res.status(200).json({ mensaje: "Reserva actualizada con vehículo alternativo y marcada como entregada." });
             }
         }
@@ -337,6 +343,12 @@ const marcarEntrega = async (req, res) => {
         const marcado = await reserveModel.actualizarEstadoVehiculo(idReserva, "Entregado");
         if (!marcado) {
             return res.status(500).json({ error: "No se pudo actualizar el estado de la reserva." });
+        }
+
+        // Cambiar estado del vehículo original a ocupado
+        const vehiculoOcupado = await vehicleModel.cambiarEstadoVehiculo(reserva.id_vehiculo, "ocupado");
+        if (!vehiculoOcupado) {
+            return res.status(500).json({ error: "No se pudo actualizar el estado del vehículo." });
         }
 
         return res.status(200).json({ mensaje: "Vehículo marcado como entregado." });

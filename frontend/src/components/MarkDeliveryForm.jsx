@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-export default function MarkDeliveryForm({ idReserva }) {
+export default function MarkDeliveryForm({ idReserva, onSuccess }) {
     const [mensaje, setMensaje] = useState("");
     const [error, setError] = useState("");
     const [alternativas, setAlternativas] = useState([]);
@@ -18,18 +18,15 @@ export default function MarkDeliveryForm({ idReserva }) {
             const res = await axios.post(
                 "http://localhost:3000/api/reserve/marcar-entrega",
                 { idReserva },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            if (res.data.alternativas && res.data.alternativas.length > 0) {
+            if (res.data.alternativas?.length > 0) {
                 setAlternativas(res.data.alternativas);
                 setMensaje(res.data.mensaje);
             } else {
                 setMensaje(res.data.mensaje);
+                if (onSuccess) onSuccess(); // ✅ Actualizar reservas
             }
         } catch (err) {
             setError(err.response?.data?.error || "Error al marcar entrega.");
@@ -41,20 +38,14 @@ export default function MarkDeliveryForm({ idReserva }) {
             const res = await axios.post(
                 "http://localhost:3000/api/reserve/marcar-entrega",
                 { idReserva, idNuevoVehiculo },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
             setMensaje(res.data.mensaje);
             setAlternativas([]);
+            if (onSuccess) onSuccess(); // ✅ Actualizar reservas
         } catch (err) {
-            setError(
-                err.response?.data?.error ||
-                "Error al cambiar el vehículo en la reserva."
-            );
+            setError(err.response?.data?.error || "Error al cambiar el vehículo.");
         }
     };
 
