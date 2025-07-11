@@ -25,7 +25,7 @@ async function registrarEmpleado(req, res) {
     await insertEmployee(id_usuario, id_sucursal);
     await enviarEmailRegistro(email, nombre, contraseña);
 
-    return res.status(201).json({ mensaje: 'El empleado fue registrado.' });
+    return res.status(201).json({ mensaje: 'Empleado registrado con exito.' });
   } catch (error) {
     console.error('Error al registrar empleado:', error);
     return res.status(500).json({ mensaje: 'Error interno del servidor' });
