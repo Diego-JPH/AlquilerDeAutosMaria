@@ -94,7 +94,7 @@ export default function CreateReserveFormEmployee() {
     e.preventDefault();
 
     if (new Date(formData.fecha_inicio) >= new Date(formData.fecha_fin)) {
-      toast.error("La fecha de inicio debe ser anterior a la fecha de fin.");
+      toast.error("Las fechas ingresadas son invalidas. Por favor revise los datos.");
       return;
     }
 
@@ -220,7 +220,7 @@ export default function CreateReserveFormEmployee() {
 
         <div className="mb-4">
           <label htmlFor="sucursal_entrega_id" className="block text-gray-700 mb-2">
-            Sucursal de entrega *
+            Sucursal de devolucion *
           </label>
           <select
             name="sucursal_entrega_id"

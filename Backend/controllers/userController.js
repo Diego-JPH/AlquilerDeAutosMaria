@@ -168,7 +168,7 @@ const registrarClientePorEmpleado = async (req, res) => {
 
   const existente = await userModel.findUserByEmail(email);
   if (existente) {
-    return res.status(400).json({ mensaje: 'El email ya está registrado' });
+    return res.status(400).json({ mensaje: 'El email ingresado pertenece a un usuario registrado' });
   }
 
   const edad = dayjs().diff(dayjs(fechaN), 'year');
