@@ -142,11 +142,15 @@ function EmployeeList() {
             : emp.email;
 
           const estaActivo = Number(emp.activo) === 1;
-
           return (
             <li key={emp.id_usuario} className="border p-3 rounded shadow-sm flex justify-between items-center">
               <div>
-                {emp.nombre} {emp.apellido} ({emailVisible}) - {emp.sucursal}
+                <div>
+                  {emp.nombre} {emp.apellido} {emailVisible} - {emp.sucursal}
+                </div>
+                {!estaActivo && (
+                  <div className="text-red-600 font-semibold mt-1">Inactivo</div>
+                )}
               </div>
               {estaActivo && (
                 <button
