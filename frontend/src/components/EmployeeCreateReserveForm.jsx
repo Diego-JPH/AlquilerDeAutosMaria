@@ -6,42 +6,38 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function CreateReserveFormEmployee() {
   const location = useLocation();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
 
-  /* ------------------------ parámetros por query ------------------------ */
-  const queryParams     = new URLSearchParams(location.search);
-  const idVehiculo      = queryParams.get("idVehiculo");
-  const sucursalRetiro  = queryParams.get("idSucursal");
-  const precioPorDia    = parseFloat(queryParams.get("precioPorDia"));
+  const queryParams = new URLSearchParams(location.search);
+  const idVehiculo = queryParams.get("idVehiculo");
+  const sucursalRetiro = queryParams.get("idSucursal");
+  const precioPorDia = parseFloat(queryParams.get("precioPorDia"));
   const fechaDesdeQuery = queryParams.get("fechaDesde");
   const fechaHastaQuery = queryParams.get("fechaHasta");
 
-  /* ------------------------------ estados ------------------------------ */
   const [formData, setFormData] = useState({
-    correoCliente        : "",
-    fecha_inicio         : fechaDesdeQuery || "",
-    fecha_fin            : fechaHastaQuery || "",
-    sucursal_entrega_id  : "",
-    nombre               : "",
-    apellido             : "",
-    fechaN               : "",
-    licencia             : "",
-    /* extras */
-    seguro               : false,
-    peajes               : false,
+    correoCliente: "",
+    fecha_inicio: fechaDesdeQuery || "",
+    fecha_fin: fechaHastaQuery || "",
+    sucursal_entrega_id: "",
+    nombre: "",
+    apellido: "",
+    fechaN: "",
+    licencia: "",
+    seguro: false,
+    peajes: false,
   });
 
-  const [sucursales, setSucursales]           = useState([]);
+  const [sucursales, setSucursales] = useState([]);
   const [clienteNoEncontrado, setClienteNoEncontrado] = useState(false);
 
-  /* ------------------------- carga de sucursales ------------------------ */
   useEffect(() => {
-    axios.get("http://localhost:3000/api/sucursales/getSucursales")
-      .then(r => setSucursales(r.data))
-      .catch(err => console.error("Error al obtener sucursales:", err));
+    axios
+      .get("http://localhost:3000/api/sucursales/getSucursales")
+      .then((r) => setSucursales(r.data))
+      .catch((err) => console.error("Error al obtener sucursales:", err));
   }, []);
 
-  /* ------------------------------ helpers ------------------------------- */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
@@ -51,15 +47,14 @@ export default function CreateReserveFormEmployee() {
     if (!fecha) return 0;
     const hoy = new Date();
     const nac = new Date(fecha);
-    let edad  = hoy.getFullYear() - nac.getFullYear();
-    const m   = hoy.getMonth() - nac.getMonth();
+    let edad = hoy.getFullYear() - nac.getFullYear();
+    const m = hoy.getMonth() - nac.getMonth();
     if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
     return edad;
   };
 
   const edadConductor = calcularEdad(formData.fechaN);
 
-  /** costo base sin extras */
   const costoDias = () => {
     const ini = new Date(formData.fecha_inicio);
     const fin = new Date(formData.fecha_fin);
@@ -68,17 +63,14 @@ export default function CreateReserveFormEmployee() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24)) * precioPorDia;
   };
 
-  /** extras fijos */
-  const EXTRA_SEGURO = 10_000;
-  const EXTRA_PEAJES = 5_000;
+  const EXTRA_SEGURO = 10000;
+  const EXTRA_PEAJES = 5000;
 
   const costoExtras = () =>
-    (formData.seguro ? EXTRA_SEGURO : 0) +
-    (formData.peajes ? EXTRA_PEAJES : 0);
+    (formData.seguro ? EXTRA_SEGURO : 0) + (formData.peajes ? EXTRA_PEAJES : 0);
 
   const montoTotal = () => costoDias() + costoExtras();
 
-  /* --------------------------- buscar cliente --------------------------- */
   const handleBuscarCliente = async () => {
     try {
       const r = await axios.get(
@@ -98,11 +90,9 @@ export default function CreateReserveFormEmployee() {
     }
   };
 
-  /* ------------------------------ submit ------------------------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    /* Validaciones básicas */
     if (new Date(formData.fecha_inicio) >= new Date(formData.fecha_fin)) {
       toast.error("La fecha de inicio debe ser anterior a la fecha de fin.");
       return;
@@ -116,7 +106,6 @@ export default function CreateReserveFormEmployee() {
       return;
     }
 
-    /* buscar usuario */
     let idUsuario;
     try {
       const r = await axios.get(
@@ -133,31 +122,38 @@ export default function CreateReserveFormEmployee() {
       return;
     }
 
-    /* DTO para PaymentPage */
     const reservaData = {
-      id_vehiculo          : idVehiculo,
-      id_usuario           : idUsuario,
-      fechaDesde           : formData.fecha_inicio,
-      fechaHasta           : formData.fecha_fin,
-      sucursal_retiro_id   : parseInt(sucursalRetiro),
-      sucursal_entrega_id  : parseInt(formData.sucursal_entrega_id),
-      nombre               : formData.nombre,
-      apellido             : formData.apellido,
-      fechaN               : formData.fechaN,
-      licencia             : formData.licencia,
-      monto                : montoTotal(),
-      /* indicamos qué extras eligió */
-      incluyeSeguro        : formData.seguro,
-      incluyePeajes        : formData.peajes,
-      costoSeguro          : formData.seguro ? EXTRA_SEGURO : 0,
-      costoPeajes          : formData.peajes ? EXTRA_PEAJES : 0,
+      id_vehiculo: idVehiculo,
+      id_usuario: idUsuario,
+      fechaDesde: formData.fecha_inicio,
+      fechaHasta: formData.fecha_fin,
+      sucursal_retiro_id: parseInt(sucursalRetiro),
+      sucursal_entrega_id: parseInt(formData.sucursal_entrega_id),
+      nombre: formData.nombre,
+      apellido: formData.apellido,
+      fechaN: formData.fechaN,
+      licencia: formData.licencia,
+      monto: montoTotal(),
+      incluyeSeguro: formData.seguro,
+      incluyePeajes: formData.peajes,
+      costoSeguro: formData.seguro ? EXTRA_SEGURO : 0,
+      costoPeajes: formData.peajes ? EXTRA_PEAJES : 0,
     };
 
-    /* Pasar al paso de pago */
+    // 🔒 Verificación previa
+    try {
+      await axios.post("http://localhost:3000/api/reserve/reserveVerification", reservaData);
+    } catch (error) {
+      const msg =
+        error.response?.data?.error ||
+        "No se pudo verificar la reserva. Intente nuevamente.";
+      toast.error(msg);
+      return;
+    }
+
     navigate("/payment", { state: { reservaData } });
   };
 
-  /* ================================ UI ================================ */
   return (
     <>
       <form
@@ -166,7 +162,6 @@ export default function CreateReserveFormEmployee() {
       >
         <h2 className="text-xl font-semibold mb-4">Reservar para Cliente</h2>
 
-        {/* ---------- Correo + Buscar ---------- */}
         <div className="mb-4">
           <label className="block font-medium mb-1">Correo del Cliente *</label>
           <div className="flex gap-2">
@@ -196,7 +191,6 @@ export default function CreateReserveFormEmployee() {
           )}
         </div>
 
-        {/* ---------- Fechas ---------- */}
         <div className="mb-4">
           <label htmlFor="fecha_inicio" className="block mb-2">
             Fecha de inicio *
@@ -225,7 +219,6 @@ export default function CreateReserveFormEmployee() {
           />
         </div>
 
-        {/* ---------- Sucursal entrega ---------- */}
         <div className="mb-4">
           <label htmlFor="sucursal_entrega_id" className="block mb-2">
             Sucursal de entrega *
@@ -246,7 +239,6 @@ export default function CreateReserveFormEmployee() {
           </select>
         </div>
 
-        {/* ---------- Datos conductor ---------- */}
         <div className="mb-4">
           <label className="block mb-1">Nombre del Conductor *</label>
           <input
@@ -295,10 +287,8 @@ export default function CreateReserveFormEmployee() {
           />
         </div>
 
-        {/* ---------- Extras opcionales ---------- */}
         <fieldset className="mb-6 border rounded p-4">
           <legend className="font-semibold text-gray-700">Extras opcionales</legend>
-
           <label className="flex items-center gap-2 my-2">
             <input
               type="checkbox"
@@ -308,7 +298,6 @@ export default function CreateReserveFormEmployee() {
             />
             Incluir seguro (+${EXTRA_SEGURO})
           </label>
-
           <label className="flex items-center gap-2 my-2">
             <input
               type="checkbox"
@@ -320,7 +309,6 @@ export default function CreateReserveFormEmployee() {
           </label>
         </fieldset>
 
-        {/* ---------- Monto estimado ---------- */}
         {montoTotal() > 0 && (
           <div className="mb-4 text-right font-medium">
             <span className="text-gray-600">Monto estimado:&nbsp;</span>
